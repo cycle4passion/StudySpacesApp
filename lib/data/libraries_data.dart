@@ -12,7 +12,8 @@ const String librariesJson = '''
         "hours": "24/7 during semester",
         "features": ["24-hour access", "Group study rooms", "Computer lab", "Cafe"],
         "floors": 5,
-        "capacity": 800
+        "capacity": 800,
+        "fullness": 3
       },
       {
         "id": "uris",
@@ -23,7 +24,8 @@ const String librariesJson = '''
         "hours": "Mon-Thu 8am-2am, Fri 8am-10pm, Sat 10am-10pm, Sun 10am-2am",
         "features": ["Silent study floors", "Collaborative spaces", "Research assistance", "Printing services"],
         "floors": 4,
-        "capacity": 600
+        "capacity": 600,
+        "fullness": 4
       },
       {
         "id": "mann",
@@ -34,7 +36,8 @@ const String librariesJson = '''
         "hours": "Mon-Thu 8am-midnight, Fri 8am-6pm, Sat 10am-6pm, Sun noon-midnight",
         "features": ["Research collections", "Digital media lab", "Study carrels", "Meeting rooms"],
         "floors": 3,
-        "capacity": 400
+        "capacity": 400,
+        "fullness": 2
       },
       {
         "id": "engineering",
@@ -45,7 +48,8 @@ const String librariesJson = '''
         "hours": "Mon-Thu 8am-midnight, Fri 8am-8pm, Sat-Sun 10am-8pm",
         "features": ["Technical databases", "3D printing", "Maker space", "Collaboration rooms"],
         "floors": 2,
-        "capacity": 300
+        "capacity": 300,
+        "fullness": 5
       },
       {
         "id": "kroch",
@@ -56,7 +60,8 @@ const String librariesJson = '''
         "hours": "Mon-Fri 9am-5pm, Sat 9am-1pm",
         "features": ["Rare books", "Manuscript collections", "Asia collections", "Exhibition spaces"],
         "floors": 3,
-        "capacity": 200
+        "capacity": 200,
+        "fullness": 1
       },
       {
         "id": "finearts",
@@ -67,7 +72,8 @@ const String librariesJson = '''
         "hours": "Mon-Thu 9am-9pm, Fri 9am-5pm, Sat-Sun 1pm-5pm",
         "features": ["Art collections", "Architecture resources", "Visual materials", "Study spaces"],
         "floors": 2,
-        "capacity": 150
+        "capacity": 150,
+        "fullness": 2
       },
       {
         "id": "music",
@@ -78,7 +84,8 @@ const String librariesJson = '''
         "hours": "Mon-Thu 9am-9pm, Fri 9am-5pm, Sat-Sun 1pm-5pm",
         "features": ["Music scores", "Audio collections", "Practice rooms", "Performance space"],
         "floors": 2,
-        "capacity": 100
+        "capacity": 100,
+        "fullness": 1
       },
       {
         "id": "law",
@@ -89,7 +96,8 @@ const String librariesJson = '''
         "hours": "24/7 during semester for law students",
         "features": ["Legal databases", "Study carrels", "Group study rooms", "Research assistance"],
         "floors": 4,
-        "capacity": 500
+        "capacity": 500,
+        "fullness": 3
       }
     ]
   }

@@ -8,6 +8,7 @@ class Library {
   final List<String> features;
   final int floors;
   final int capacity;
+  final int fullness;
 
   const Library({
     required this.id,
@@ -19,6 +20,7 @@ class Library {
     required this.features,
     required this.floors,
     required this.capacity,
+    required this.fullness,
   });
 
   factory Library.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class Library {
       features: List<String>.from(json['features']),
       floors: json['floors'] as int,
       capacity: json['capacity'] as int,
+      fullness: json['fullness'] as int,
     );
   }
 
@@ -46,6 +49,7 @@ class Library {
       'features': features,
       'floors': floors,
       'capacity': capacity,
+      'fullness': fullness,
     };
   }
 }

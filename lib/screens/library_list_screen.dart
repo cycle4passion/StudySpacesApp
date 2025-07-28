@@ -1,50 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:chaleno/chaleno.dart';
 import '../models/library.dart';
 import '../data/libraries_data.dart';
 import 'library_detail_screen.dart';
+import '../utils/color_utils.dart';
+import '../utils/library_utils.dart';
 import 'dart:convert';
 
-Future<void> scrape() async {
-  var parser = await Chaleno().load('https://example.com');
-  final contents = parser?.querySelector('h1').text;
-  print('Scrape result: $contents');
-}
-
-Map<String, dynamic> weightedAverageWithDetails(
-  List<Map<String, dynamic>> items,
-) {
-  if (items.isEmpty) {
-    return {'weightedavg': 0.0, 'details': []};
-  }
-  double weightedSum = 0;
-  double totalWeight = 0;
-  List<Map<String, dynamic>> details = [];
-
-  for (var item in items) {
-    final source = item['source'];
-    final values = (item['value'] as List)
-        .map((v) => (v as num).toDouble())
-        .toList();
-    double baseWeight = (item['weight'] as num).toDouble();
-    double bump = (item['bump'] as num?)?.toDouble() ?? 0.0;
-    double itemWeight = baseWeight;
-    for (var v in values) {
-      if (v > 1 && itemWeight < 1) itemWeight += bump;
-    }
-    double avg = values.isEmpty
-        ? 0
-        : values.reduce((a, b) => a + b) / values.length;
-    weightedSum += avg * itemWeight;
-    totalWeight += itemWeight;
-    details.add({'source': source, 'avg': avg});
-  }
-  double avg = totalWeight == 0 ? 0 : (weightedSum / totalWeight).clamp(0, 100);
-  return {'weightedavg': avg, 'details': details};
-}
-
 class LibraryListScreen extends StatefulWidget {
-  const LibraryListScreen({super.key});
+  final VoidCallback onThemeToggle;
+  final bool isDarkMode;
+
+  const LibraryListScreen({
+    super.key,
+    required this.onThemeToggle,
+    required this.isDarkMode,
+  });
 
   @override
   State<LibraryListScreen> createState() => _LibraryListScreenState();
@@ -57,44 +27,6 @@ class _LibraryListScreenState extends State<LibraryListScreen> {
   void initState() {
     super.initState();
     _loadLibraries();
-    _loadScrapeData();
-  }
-
-  Future<void> _loadScrapeData() async {
-    try {
-      // Using cors-anywhere as a proxy
-      var proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-      var targetUrl = 'https://example.com';
-      var parser = await Chaleno().load(proxyUrl + targetUrl);
-
-      if (parser == null) {
-        throw Exception('Failed to load webpage');
-      }
-
-      // Get both title and any h1 content
-      final title = parser.title;
-      final h1Text = parser.querySelector('h1').text;
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Scraped - Title: $title, H1: $h1Text'),
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Scraping error: $e'); // For debugging
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error scraping: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
-    }
   }
 
   void _loadLibraries() {
@@ -109,18 +41,46 @@ class _LibraryListScreenState extends State<LibraryListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Cornell Study Spaces',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: Colors.green.shade700, width: 2.0),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Image.asset(
+                'assets/icon/icon.png',
+                width: 32,
+                height: 32,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Study Spaces',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: Colors.green,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.calculate),
+            icon: Icon(
+              widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Colors.white,
+            ),
+            tooltip: widget.isDarkMode
+                ? 'Switch to Light Mode'
+                : 'Switch to Dark Mode',
+            onPressed: widget.onThemeToggle,
+          ),
+          IconButton(
+            icon: const Icon(Icons.calculate, color: Colors.white),
             tooltip: 'Show Weighted Average',
             onPressed: () {
-              final result = weightedAverageWithDetails([
+              final result = LibraryUtils.weightedAverageWithDetails([
                 {
                   'source': 'user',
                   'value': [5, 3, 3],
@@ -209,7 +169,7 @@ class _LibraryListScreenState extends State<LibraryListScreen> {
                                 top: Radius.circular(16),
                               ),
                               child: SizedBox(
-                                height: 200,
+                                height: 133,
                                 width: double.infinity,
                                 child: Image.asset(
                                   library.image,
@@ -273,41 +233,67 @@ class _LibraryListScreenState extends State<LibraryListScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 12),
-                                Text(
-                                  library.description,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 12),
                                 Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Icon(
-                                      Icons.people,
-                                      size: 16,
-                                      color: Colors.grey[600],
+                                    // Left side - Fullness indicator
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 12,
+                                          height: 12,
+                                          decoration: BoxDecoration(
+                                            color: ColorUtils.getFullnessColor(
+                                              library.fullness,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          LibraryUtils.getFullnessText(
+                                            library.fullness,
+                                          ),
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${library.capacity} capacity',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(
-                                      Icons.layers,
-                                      size: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${library.floors} floors',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
+                                    // Right side - Capacity and floors
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.people,
+                                          size: 16,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Capacity ${library.capacity}',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Icon(
+                                          Icons.layers,
+                                          size: 16,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${library.floors} Floor${library.floors == 1 ? '' : 's'}',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
