@@ -71,7 +71,7 @@ class LibraryDetailScreen extends StatelessWidget {
                         child: Icon(
                           Icons.local_library,
                           size: 120,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
                     );
@@ -100,6 +100,11 @@ class LibraryDetailScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildCategoryCard(context),
                   const SizedBox(height: 12),
+                  // Show "Currently Closed" if library is not open
+                  if (!LibraryUtils.isOpen(library.openat, library.closeat))
+                    _buildClosedCard(context),
+                  if (!LibraryUtils.isOpen(library.openat, library.closeat))
+                    const SizedBox(height: 12),
                   _buildDetailCard(
                     context,
                     Icons.schedule,
@@ -186,12 +191,22 @@ class LibraryDetailScreen extends StatelessWidget {
       bottomNavigationBar: onTabTapped != null
           ? BottomNavigationBar(
               currentIndex: currentIndex ?? 0,
-              onTap: onTabTapped!,
+              onTap: (index) {
+                // Pop the current screen first
+                Navigator.of(context).pop();
+                // Then switch to the appropriate tab
+                onTabTapped!(index);
+              },
               type: BottomNavigationBarType.fixed,
-              selectedItemColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Colors.green,
+              selectedItemColor: Theme.of(context).colorScheme.onPrimary,
               unselectedItemColor: Theme.of(
                 context,
-              ).colorScheme.onSurface.withOpacity(0.6),
+              ).colorScheme.onPrimary.withValues(alpha: 0.7),
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.normal,
+              ),
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
                 BottomNavigationBarItem(
@@ -224,8 +239,8 @@ class LibraryDetailScreen extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.1),
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 6,
             offset: const Offset(0, 2),
@@ -237,7 +252,9 @@ class LibraryDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -275,7 +292,7 @@ class LibraryDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(BuildContext context) {
+  Widget _buildClosedCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -283,11 +300,12 @@ class LibraryDetailScreen extends StatelessWidget {
             ? const Color(0xFF2D2D2D)
             : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3), width: 1),
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.1),
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 6,
             offset: const Offset(0, 2),
@@ -299,7 +317,68 @@ class LibraryDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Colors.red.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.access_time_filled, color: Colors.red, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Status',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Currently Closed',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF2D2D2D)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -360,14 +439,14 @@ class LibraryDetailScreen extends StatelessWidget {
               : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black.withOpacity(0.3)
-                  : Colors.grey.withOpacity(0.1),
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 6,
               offset: const Offset(0, 2),
@@ -379,7 +458,9 @@ class LibraryDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -405,9 +486,7 @@ class LibraryDetailScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     library.phone,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyLarge?.copyWith(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.primary,
                     ),

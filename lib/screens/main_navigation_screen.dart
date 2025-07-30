@@ -56,7 +56,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         selectedItemColor: Theme.of(context).colorScheme.onPrimary,
         unselectedItemColor: Theme.of(
           context,
-        ).colorScheme.onPrimary.withOpacity(0.7),
+        ).colorScheme.onPrimary.withValues(alpha: 0.7),
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
         items: const [

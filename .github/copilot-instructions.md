@@ -16,3 +16,6 @@ When working on this project:
 - Implement proper hero animations for image transitions
 - Follow Flutter best practices for state management
 - Use proper JSON serialization for data models
+- always check the utils folder for utility functions for existing function that can help with common tasks like is the library open, color management, library data handling, and text formatting.
+
+If you wish to run flutter analyze and rerun the test environment use chrome not ios please.

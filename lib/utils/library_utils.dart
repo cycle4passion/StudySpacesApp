@@ -152,13 +152,15 @@ class LibraryUtils {
   static String getStatusText(List<int> openat, List<int> closeat) {
     final now = DateTime.now();
     int dayIndex = now.weekday - 1;
-    
-    if (dayIndex < 0 || dayIndex >= openat.length || dayIndex >= closeat.length) {
+
+    if (dayIndex < 0 ||
+        dayIndex >= openat.length ||
+        dayIndex >= closeat.length) {
       return '';
     }
 
     bool libraryIsOpen = isOpen(openat, closeat);
-    
+
     if (libraryIsOpen) {
       // Library is open, show when it closes
       int closeTime = closeat[dayIndex];

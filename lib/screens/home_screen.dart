@@ -43,9 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       libraries = cornellLibraries.map((lib) => Library.fromJson(lib)).toList();
       // Initialize favorite states from library data
-      favoriteStates = {
-        for (var lib in libraries) lib.id: lib.isFavorite
-      };
+      favoriteStates = {for (var lib in libraries) lib.id: lib.isFavorite};
     });
   }
 
@@ -172,21 +170,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         InkWell(
                           borderRadius: BorderRadius.circular(16),
-                          onTap: isLibraryOpen
-                              ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LibraryDetailScreen(
-                                        library: library,
-                                        onHomePressed: widget.onHomePressed,
-                                        onTabTapped: widget.onTabTapped,
-                                        currentIndex: widget.currentIndex,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              : null,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LibraryDetailScreen(
+                                  library: library,
+                                  onHomePressed: widget.onHomePressed,
+                                  onTabTapped: widget.onTabTapped,
+                                  currentIndex: widget.currentIndex,
+                                ),
+                              ),
+                            );
+                          },
                           child: Opacity(
                             opacity: isLibraryOpen ? 1.0 : 0.3,
                             child: Column(
@@ -197,9 +193,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Hero(
                                       tag: 'library-image-${library.id}',
                                       child: ClipRRect(
-                                        borderRadius: const BorderRadius.vertical(
-                                          top: Radius.circular(16),
-                                        ),
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                              top: Radius.circular(16),
+                                            ),
                                         child: SizedBox(
                                           height: 133,
                                           width: double.infinity,
@@ -211,11 +208,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   return Container(
                                                     decoration: BoxDecoration(
                                                       gradient: LinearGradient(
-                                                        begin: Alignment.topLeft,
-                                                        end: Alignment.bottomRight,
+                                                        begin:
+                                                            Alignment.topLeft,
+                                                        end: Alignment
+                                                            .bottomRight,
                                                         colors: [
                                                           Colors.blue.shade300,
-                                                          Colors.purple.shade300,
+                                                          Colors
+                                                              .purple
+                                                              .shade300,
                                                         ],
                                                       ),
                                                     ),
@@ -223,7 +224,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Icons.local_library,
                                                       size: 80,
                                                       color: Colors.white
-                                                          .withOpacity(0.8),
+                                                          .withValues(
+                                                            alpha: 0.8,
+                                                          ),
                                                     ),
                                                   );
                                                 },
@@ -235,27 +238,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                       top: 8,
                                       right: 8,
                                       child: Tooltip(
-                                        message: (favoriteStates[library.id] ?? false)
+                                        message:
+                                            (favoriteStates[library.id] ??
+                                                false)
                                             ? "Unfavorite"
                                             : "Favorite",
                                         child: GestureDetector(
                                           onTap: () {
                                             setState(() {
-                                              favoriteStates[library.id] = 
-                                                  !(favoriteStates[library.id] ?? false);
+                                              favoriteStates[library.id] =
+                                                  !(favoriteStates[library
+                                                          .id] ??
+                                                      false);
                                             });
                                           },
                                           child: Container(
                                             padding: const EdgeInsets.all(4),
                                             decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.3),
+                                              color: Colors.black.withValues(
+                                                alpha: 0.3,
+                                              ),
                                               shape: BoxShape.circle,
                                             ),
                                             child: Icon(
-                                              (favoriteStates[library.id] ?? false)
+                                              (favoriteStates[library.id] ??
+                                                      false)
                                                   ? Icons.star
                                                   : Icons.star_border,
-                                              color: (favoriteStates[library.id] ?? false)
+                                              color:
+                                                  (favoriteStates[library.id] ??
+                                                      false)
                                                   ? Colors.yellow[600]
                                                   : Colors.white,
                                               size: 24,
@@ -292,14 +304,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           Text(
                                             LibraryUtils.getStatusText(
-                                                library.openat, library.closeat),
+                                              library.openat,
+                                              library.closeat,
+                                            ),
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyMedium
                                                 ?.copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface,
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                           ),
@@ -319,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .primary
-                                                  .withOpacity(0.1),
+                                                  .withValues(alpha: 0.1),
                                               borderRadius:
                                                   BorderRadius.circular(20),
                                             ),
@@ -334,62 +348,63 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                           ),
-                                          Tooltip(
-                                            message: 'Report on Fullness',
-                                            child: GestureDetector(
-                                              onTap: isLibraryOpen
-                                                  ? () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              ReportScreen(
-                                                                onHomePressed:
-                                                                    widget
-                                                                        .onHomePressed,
-                                                                preSelectedLibrary:
-                                                                    library,
-                                                              ),
+                                          // Only show report button if library is open
+                                          if (isLibraryOpen)
+                                            Tooltip(
+                                              message: 'Report on Fullness',
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ReportScreen(
+                                                            onHomePressed: widget
+                                                                .onHomePressed,
+                                                            preSelectedLibrary:
+                                                                library,
+                                                          ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(
+                                                    8,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green
+                                                        .withValues(alpha: 0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
                                                         ),
-                                                      );
-                                                    }
-                                                  : null,
-                                              child: Container(
-                                                padding: const EdgeInsets.all(
-                                                  8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.green
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Image.asset(
-                                                  'assets/icon/report.png',
-                                                  width: 20,
-                                                  height: 20,
-                                                  fit: BoxFit.contain,
-                                                  filterQuality:
-                                                      FilterQuality.high,
-                                                  isAntiAlias: true,
-                                                  errorBuilder:
-                                                      (
-                                                        context,
-                                                        error,
-                                                        stackTrace,
-                                                      ) {
-                                                        return Icon(
-                                                          Icons.report,
-                                                          size: 20,
-                                                          color: Colors
-                                                              .green
-                                                              .shade700,
-                                                        );
-                                                      },
+                                                  ),
+                                                  child: Image.asset(
+                                                    'assets/icon/report.png',
+                                                    width: 20,
+                                                    height: 20,
+                                                    fit: BoxFit.contain,
+                                                    filterQuality:
+                                                        FilterQuality.high,
+                                                    isAntiAlias: true,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return Icon(
+                                                            Icons.report,
+                                                            size: 20,
+                                                            color: Colors
+                                                                .green
+                                                                .shade700,
+                                                          );
+                                                        },
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 12),
@@ -397,36 +412,39 @@ class _HomeScreenState extends State<HomeScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          // Left side - Fullness indicator
-                                          Row(
-                                            children: [
-                                              Container(
-                                                width: 12,
-                                                height: 12,
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      ColorUtils.getFullnessColor(
-                                                        library.fullness,
-                                                      ),
-                                                  shape: BoxShape.circle,
+                                          // Left side - Fullness indicator (only if library is open)
+                                          if (isLibraryOpen)
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: 12,
+                                                  height: 12,
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        ColorUtils.getFullnessColor(
+                                                          library.fullness,
+                                                        ),
+                                                    shape: BoxShape.circle,
+                                                  ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                LibraryUtils.getFullnessText(
-                                                  library.fullness,
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  LibraryUtils.getFullnessText(
+                                                    library.fullness,
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface
+                                                        .withValues(alpha: 0.8),
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface
-                                                      .withOpacity(0.8),
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                              ],
+                                            ),
+                                          // If library is closed, use a spacer to push content right
+                                          if (!isLibraryOpen) const Spacer(),
                                           // Right side - Capacity and floors
                                           Row(
                                             children: [
@@ -436,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurface
-                                                    .withOpacity(0.6),
+                                                    .withValues(alpha: 0.6),
                                               ),
                                               const SizedBox(width: 4),
                                               Text(
@@ -445,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   color: Theme.of(context)
                                                       .colorScheme
                                                       .onSurface
-                                                      .withOpacity(0.6),
+                                                      .withValues(alpha: 0.6),
                                                   fontSize: 12,
                                                 ),
                                               ),
@@ -456,7 +474,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurface
-                                                    .withOpacity(0.6),
+                                                    .withValues(alpha: 0.6),
                                               ),
                                               const SizedBox(width: 4),
                                               Text(
@@ -465,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   color: Theme.of(context)
                                                       .colorScheme
                                                       .onSurface
-                                                      .withOpacity(0.6),
+                                                      .withValues(alpha: 0.6),
                                                   fontSize: 12,
                                                 ),
                                               ),
@@ -483,13 +501,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Diagonal "CLOSED" overlay for closed libraries
                         if (!isLibraryOpen)
                           Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                color: Colors.black.withOpacity(0.1),
-                              ),
-                              child: CustomPaint(
-                                painter: DiagonalTextPainter(),
+                            child: IgnorePointer(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                ),
+                                child: CustomPaint(
+                                  painter: DiagonalTextPainter(),
+                                ),
                               ),
                             ),
                           ),
@@ -512,7 +532,7 @@ class DiagonalTextPainter extends CustomPainter {
       text: TextSpan(
         text: 'CLOSED',
         style: TextStyle(
-          color: Colors.red.withOpacity(0.3),
+          color: Colors.red.withValues(alpha: 0.3),
           fontSize: 96,
           fontWeight: FontWeight.bold,
         ),

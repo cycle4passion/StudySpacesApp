@@ -44,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
             Icon(
               Icons.person,
               size: 100,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             const SizedBox(height: 20),
             Text(
@@ -52,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 10),
@@ -60,7 +60,7 @@ class ProfileScreen extends StatelessWidget {
               'Coming Soon...',
               style: TextStyle(
                 fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],

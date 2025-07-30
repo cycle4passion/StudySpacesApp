@@ -39,7 +39,7 @@ class ColorUtils {
   /// Returns shadow color based on theme
   static Color getShadowColor(bool isDarkMode) {
     return isDarkMode
-        ? Colors.black.withOpacity(0.3)
-        : Colors.grey.withOpacity(0.2);
+        ? Colors.black.withValues(alpha: 0.3)
+        : Colors.grey.withValues(alpha: 0.2);
   }
 }

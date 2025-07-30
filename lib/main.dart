@@ -50,7 +50,7 @@ class _StudySpacesAppState extends State<StudySpacesApp> {
       title: 'StudySpaces',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1976D2), // Cornell blue
+          seedColor: Colors.green,
           brightness: Brightness.light,
         ),
         useMaterial3: true,
@@ -65,7 +65,7 @@ class _StudySpacesAppState extends State<StudySpacesApp> {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1976D2), // Cornell blue
+          seedColor: Colors.green,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
