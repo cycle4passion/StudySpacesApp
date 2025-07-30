@@ -19,7 +19,8 @@ const String librariesJson = '''
         "floors": 5,
         "capacity": 800,
         "fullness": 3,
-        "isFavorite": true
+        "isFavorite": true,
+        "phone": "(607) 255-4144"
       },
       {
         "id": "uris",
@@ -37,7 +38,8 @@ const String librariesJson = '''
         "floors": 4,
         "capacity": 600,
         "fullness": 4,
-        "isFavorite": false
+        "isFavorite": false,
+        "phone": "(607) 255-4144"
       },
       {
         "id": "mann",
@@ -55,7 +57,8 @@ const String librariesJson = '''
         "floors": 3,
         "capacity": 400,
         "fullness": 2,
-        "isFavorite": true
+        "isFavorite": true,
+        "phone": "(607) 255-3296"
       },
       {
         "id": "engineering",
@@ -73,7 +76,8 @@ const String librariesJson = '''
         "floors": 2,
         "capacity": 300,
         "fullness": 5,
-        "isFavorite": false
+        "isFavorite": false,
+        "phone": "(607) 255-4144"
       },
       {
         "id": "kroch",
@@ -91,7 +95,8 @@ const String librariesJson = '''
         "floors": 3,
         "capacity": 200,
         "fullness": 1,
-        "isFavorite": true
+        "isFavorite": true,
+        "phone": "(607) 255-3530"
       },
       {
         "id": "finearts",
@@ -109,7 +114,8 @@ const String librariesJson = '''
         "floors": 2,
         "capacity": 150,
         "fullness": 2,
-        "isFavorite": false
+        "isFavorite": false,
+        "phone": "(607) 255-3710"
       },
       {
         "id": "music",
@@ -127,7 +133,8 @@ const String librariesJson = '''
         "floors": 2,
         "capacity": 100,
         "fullness": 1,
-        "isFavorite": true
+        "isFavorite": true,
+        "phone": "(607) 255-4011"
       },
       {
         "id": "law",
@@ -145,7 +152,8 @@ const String librariesJson = '''
         "floors": 4,
         "capacity": 500,
         "fullness": 3,
-        "isFavorite": false
+        "isFavorite": false,
+        "phone": "(607) 255-7236"
       }
     ]
   }

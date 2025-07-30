@@ -15,6 +15,7 @@ class Library {
   final int capacity;
   final int fullness;
   final bool isFavorite;
+  final String phone;
 
   Library({
     required this.id,
@@ -33,6 +34,7 @@ class Library {
     required this.capacity,
     required this.fullness,
     required this.isFavorite,
+    required this.phone,
   });
 
   factory Library.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,7 @@ class Library {
       capacity: json['capacity'],
       fullness: json['fullness'],
       isFavorite: json['isFavorite'],
+      phone: json['phone'],
     );
   }
 
@@ -74,6 +77,7 @@ class Library {
       'capacity': capacity,
       'fullness': fullness,
       'isFavorite': isFavorite,
+      'phone': phone,
     };
   }
 }
