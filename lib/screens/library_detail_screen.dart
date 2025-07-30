@@ -1,91 +1,89 @@
 import 'package:flutter/material.dart';
 import '../models/library.dart';
+import '../utils/library_utils.dart';
 
 class LibraryDetailScreen extends StatelessWidget {
   final Library library;
+  final VoidCallback? onHomePressed;
+  final Function(int)? onTabTapped;
+  final int? currentIndex;
 
-  const LibraryDetailScreen({super.key, required this.library});
+  const LibraryDetailScreen({
+    super.key,
+    required this.library,
+    this.onHomePressed,
+    this.onTabTapped,
+    this.currentIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 300,
-            pinned: true,
-            leading: Container(
-              margin: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Hero(
-                tag: 'library-image-${library.id}',
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      library.image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.blue.shade300,
-                                Colors.purple.shade300,
-                              ],
-                            ),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.local_library,
-                              size: 120,
-                              color: Colors.white.withOpacity(0.8),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    Container(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (onHomePressed != null) {
+              Navigator.of(context).pop();
+              onHomePressed!();
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+        title: Text(
+          library.name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.green,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Hero image section
+            Hero(
+              tag: 'library-image-${library.id}',
+              child: SizedBox(
+                height: 250,
+                width: double.infinity,
+                child: Image.asset(
+                  library.image,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                           colors: [
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.3),
+                            Colors.blue.shade300,
+                            Colors.purple.shade300,
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      child: Center(
+                        child: Icon(
+                          Icons.local_library,
+                          size: 120,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
+            // Content section
+            Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    library.name,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   Text(
                     library.description,
                     style: Theme.of(context).textTheme.bodyLarge,
@@ -105,7 +103,7 @@ class LibraryDetailScreen extends StatelessWidget {
                     context,
                     Icons.schedule,
                     'Hours',
-                    library.hours,
+                    LibraryUtils.formatHours(library.openat, library.closeat),
                   ),
                   const SizedBox(height: 12),
                   _buildDetailCard(
@@ -144,7 +142,8 @@ class LibraryDetailScreen extends StatelessWidget {
                               : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Theme.of(context).brightness == Brightness.dark
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
                                 ? const Color(0xFF606060)
                                 : Colors.grey.shade300,
                           ),
@@ -162,7 +161,9 @@ class LibraryDetailScreen extends StatelessWidget {
                               feature,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
-                                color: Theme.of(context).brightness == Brightness.dark
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
                                     ? Colors.grey.shade300
                                     : Colors.grey.shade800,
                               ),
@@ -176,9 +177,31 @@ class LibraryDetailScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      bottomNavigationBar: onTabTapped != null
+          ? BottomNavigationBar(
+              currentIndex: currentIndex ?? 0,
+              onTap: onTabTapped!,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: Theme.of(context).colorScheme.primary,
+              unselectedItemColor: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacity(0.6),
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.report),
+                  label: 'Report',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: 'Profile',
+                ),
+              ],
+            )
+          : null,
     );
   }
 
@@ -191,8 +214,8 @@ class LibraryDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark 
-            ? const Color(0xFF2D2D2D) 
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF2D2D2D)
             : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
@@ -253,8 +276,8 @@ class LibraryDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark 
-            ? const Color(0xFF2D2D2D) 
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF2D2D2D)
             : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [

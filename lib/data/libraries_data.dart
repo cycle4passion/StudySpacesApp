@@ -9,11 +9,17 @@ const String librariesJson = '''
         "description": "Humanities and social sciences library with extensive collections and quiet study spaces.",
         "image": "assets/images/olin_library.jpg",
         "category": "Humanities & Social Sciences",
-        "hours": "24/7 during semester",
+        "address": "161 Ho Plaza, Ithaca, NY 14853",
+        "latitude": 42.4477741,
+        "longitude": -76.4841596,
+        "range": 50.0,
+        "openat": [800, 800, 800, 800, 800, 1000, 1000],
+        "closeat": [200, 200, 200, 200, 2200, 2200, 200],
         "features": ["24-hour access", "Group study rooms", "Computer lab", "Cafe"],
         "floors": 5,
         "capacity": 800,
-        "fullness": 3
+        "fullness": 3,
+        "isFavorite": true
       },
       {
         "id": "uris",
@@ -21,11 +27,17 @@ const String librariesJson = '''
         "description": "Multi-disciplinary library serving humanities, social sciences, and engineering.",
         "image": "assets/images/uris_library.jpg",
         "category": "Multi-disciplinary",
-        "hours": "Mon-Thu 8am-2am, Fri 8am-10pm, Sat 10am-10pm, Sun 10am-2am",
+        "address": "161 Ho Plaza, Ithaca, NY 14853",
+        "latitude": 42.4477741,
+        "longitude": -76.4841596,
+        "range": 45.0,
+        "openat": [800, 800, 800, 800, 800, 1000, 1000],
+        "closeat": [801, 801, 801, 801, 801, 1001, 1001],
         "features": ["Silent study floors", "Collaborative spaces", "Research assistance", "Printing services"],
         "floors": 4,
         "capacity": 600,
-        "fullness": 4
+        "fullness": 4,
+        "isFavorite": false
       },
       {
         "id": "mann",
@@ -33,11 +45,17 @@ const String librariesJson = '''
         "description": "Life sciences, agriculture, applied social sciences, and human ecology library.",
         "image": "assets/images/mann_library.jpg",
         "category": "Life Sciences & Agriculture",
-        "hours": "Mon-Thu 8am-midnight, Fri 8am-6pm, Sat 10am-6pm, Sun noon-midnight",
+        "address": "237 Mann Dr, Ithaca, NY 14853",
+        "latitude": 42.4487952,
+        "longitude": -76.476316,
+        "range": 40.0,
+        "openat": [800, 800, 800, 800, 800, 1000, 1200],
+        "closeat": [2400, 2400, 2400, 2400, 1800, 1800, 2400],
         "features": ["Research collections", "Digital media lab", "Study carrels", "Meeting rooms"],
         "floors": 3,
         "capacity": 400,
-        "fullness": 2
+        "fullness": 2,
+        "isFavorite": true
       },
       {
         "id": "engineering",
@@ -45,11 +63,17 @@ const String librariesJson = '''
         "description": "Specialized library for engineering students and researchers.",
         "image": "assets/images/engineering_library.jpg",
         "category": "Engineering",
-        "hours": "Mon-Thu 8am-midnight, Fri 8am-8pm, Sat-Sun 10am-8pm",
+        "address": "Carpenter Hall, Ithaca, NY 14853",
+        "latitude": 42.4439,
+        "longitude": -76.4834,
+        "range": 35.0,
+        "openat": [800, 800, 800, 800, 800, 1000, 1000],
+        "closeat": [2400, 2400, 2400, 2400, 2000, 2000, 2000],
         "features": ["Technical databases", "3D printing", "Maker space", "Collaboration rooms"],
         "floors": 2,
         "capacity": 300,
-        "fullness": 5
+        "fullness": 5,
+        "isFavorite": false
       },
       {
         "id": "kroch",
@@ -57,11 +81,17 @@ const String librariesJson = '''
         "description": "Home to rare books, manuscripts, and Asia collections.",
         "image": "assets/images/kroch_library.jpg",
         "category": "Special Collections",
-        "hours": "Mon-Fri 9am-5pm, Sat 9am-1pm",
+        "address": "Carl A. Kroch Library, Ithaca, NY 14853",
+        "latitude": 42.4477741,
+        "longitude": -76.4841596,
+        "range": 30.0,
+        "openat": [900, 900, 900, 900, 900, 900, 0],
+        "closeat": [1700, 1700, 1700, 1700, 1700, 1300, 0],
         "features": ["Rare books", "Manuscript collections", "Asia collections", "Exhibition spaces"],
         "floors": 3,
         "capacity": 200,
-        "fullness": 1
+        "fullness": 1,
+        "isFavorite": true
       },
       {
         "id": "finearts",
@@ -69,11 +99,17 @@ const String librariesJson = '''
         "description": "Art, architecture, and visual studies collections.",
         "image": "assets/images/finearts_library.jpg",
         "category": "Fine Arts",
-        "hours": "Mon-Thu 9am-9pm, Fri 9am-5pm, Sat-Sun 1pm-5pm",
+        "address": "Rand Hall, Ithaca, NY 14853",
+        "latitude": 42.4454,
+        "longitude": -76.4825,
+        "range": 25.0,
+        "openat": [900, 900, 900, 900, 900, 1300, 1300],
+        "closeat": [2100, 2100, 2100, 2100, 1700, 1700, 1700],
         "features": ["Art collections", "Architecture resources", "Visual materials", "Study spaces"],
         "floors": 2,
         "capacity": 150,
-        "fullness": 2
+        "fullness": 2,
+        "isFavorite": false
       },
       {
         "id": "music",
@@ -81,11 +117,17 @@ const String librariesJson = '''
         "description": "Music and dance collections with performance spaces.",
         "image": "assets/images/music_library.jpg",
         "category": "Music & Dance",
-        "hours": "Mon-Thu 9am-9pm, Fri 9am-5pm, Sat-Sun 1pm-5pm",
+        "address": "Lincoln Hall, Ithaca, NY 14853",
+        "latitude": 42.4472,
+        "longitude": -76.4855,
+        "range": 20.0,
+        "openat": [900, 900, 900, 900, 900, 1300, 1300],
+        "closeat": [2100, 2100, 2100, 2100, 1700, 1700, 1700],
         "features": ["Music scores", "Audio collections", "Practice rooms", "Performance space"],
         "floors": 2,
         "capacity": 100,
-        "fullness": 1
+        "fullness": 1,
+        "isFavorite": true
       },
       {
         "id": "law",
@@ -93,11 +135,17 @@ const String librariesJson = '''
         "description": "Comprehensive legal research facility for law students and faculty.",
         "image": "assets/images/law_library.jpg",
         "category": "Law",
-        "hours": "24/7 during semester for law students",
+        "address": "Myron Taylor Hall, Ithaca, NY 14853",
+        "latitude": 42.4438549,
+        "longitude": -76.4857724,
+        "range": 55.0,
+        "openat": [800, 800, 800, 800, 800, 800, 800],
+        "closeat": [2200, 2200, 2200, 2200, 2200, 2200, 2200],
         "features": ["Legal databases", "Study carrels", "Group study rooms", "Research assistance"],
         "floors": 4,
         "capacity": 500,
-        "fullness": 3
+        "fullness": 3,
+        "isFavorite": false
       }
     ]
   }

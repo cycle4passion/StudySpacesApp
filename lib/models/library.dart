@@ -4,37 +4,55 @@ class Library {
   final String description;
   final String image;
   final String category;
-  final String hours;
+  final String address;
+  final double latitude;
+  final double longitude;
+  final double range;
+  final List<int> openat;
+  final List<int> closeat;
   final List<String> features;
   final int floors;
   final int capacity;
   final int fullness;
+  final bool isFavorite;
 
-  const Library({
+  Library({
     required this.id,
     required this.name,
     required this.description,
     required this.image,
     required this.category,
-    required this.hours,
+    required this.address,
+    required this.latitude,
+    required this.longitude,
+    required this.range,
+    required this.openat,
+    required this.closeat,
     required this.features,
     required this.floors,
     required this.capacity,
     required this.fullness,
+    required this.isFavorite,
   });
 
   factory Library.fromJson(Map<String, dynamic> json) {
     return Library(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String,
-      image: json['image'] as String,
-      category: json['category'] as String,
-      hours: json['hours'] as String,
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      image: json['image'],
+      category: json['category'],
+      address: json['address'],
+      latitude: json['latitude'].toDouble(),
+      longitude: json['longitude'].toDouble(),
+      range: json['range'].toDouble(),
+      openat: List<int>.from(json['openat']),
+      closeat: List<int>.from(json['closeat']),
       features: List<String>.from(json['features']),
-      floors: json['floors'] as int,
-      capacity: json['capacity'] as int,
-      fullness: json['fullness'] as int,
+      floors: json['floors'],
+      capacity: json['capacity'],
+      fullness: json['fullness'],
+      isFavorite: json['isFavorite'],
     );
   }
 
@@ -45,11 +63,17 @@ class Library {
       'description': description,
       'image': image,
       'category': category,
-      'hours': hours,
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+      'range': range,
+      'openat': openat,
+      'closeat': closeat,
       'features': features,
       'floors': floors,
       'capacity': capacity,
       'fullness': fullness,
+      'isFavorite': isFavorite,
     };
   }
 }

@@ -48,14 +48,21 @@ A Flutter application for discovering study spaces at Cornell University librari
 
 ```
 lib/
-├── main.dart                    # App entry point
+├── main.dart                       # App entry point
 ├── data/
-│   └── libraries_data.dart      # JSON data for Cornell libraries
+│   └── libraries_data.dart         # JSON data for Cornell libraries
 ├── models/
-│   └── library.dart             # Library data model
+│   └── library.dart                # Library data model
+├── utils/
+│   ├── color_utils.dart           # Color utility functions
+│   ├── library_utils.dart         # Library utility functions
+│   └── text_utils.dart            # Text utility functions
 └── screens/
-    ├── library_list_screen.dart # Main list view
-    └── library_detail_screen.dart # Detailed library view
+    ├── main_navigation_screen.dart # Main navigation with bottom tabs
+    ├── home_screen.dart            # Home tab - library list view
+    ├── report_screen.dart          # Report tab - placeholder
+    ├── profile_screen.dart         # Profile tab - placeholder
+    └── library_detail_screen.dart  # Detailed library view
 ```
 
 ## Libraries Included

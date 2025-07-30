@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/library_list_screen.dart';
+import 'screens/main_navigation_screen.dart';
 
 void main() {
   runApp(const StudySpacesApp());
@@ -80,7 +80,7 @@ class _StudySpacesAppState extends State<StudySpacesApp> {
         // Let Material 3 handle text colors automatically for better contrast
       ),
       themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: LibraryListScreen(
+      home: MainNavigationScreen(
         onThemeToggle: _toggleTheme,
         isDarkMode: _isDarkMode,
       ),

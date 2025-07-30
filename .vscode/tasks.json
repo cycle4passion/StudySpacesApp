@@ -9,6 +9,15 @@
 			"group": "build",
 			"isBackground": true,
 			"problemMatcher": []
+		},
+		{
+			"label": "Run Flutter Chrome",
+			"type": "shell",
+			"command": "flutter",
+			"args": ["run", "-d", "chrome"],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
 		}
 	]
 }
