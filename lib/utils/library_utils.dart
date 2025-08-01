@@ -173,6 +173,68 @@ class LibraryUtils {
       return 'Opens at ${_formatMilitaryTime(openTime)}';
     }
   }
+
+  /// Gets detailed closed status text with hours until opening
+  static String getClosedStatusWithHours(List<int> openat, List<int> closeat) {
+    final now = DateTime.now();
+    int currentDayIndex = now.weekday - 1;
+
+    // Find the next opening time
+    for (int i = 0; i < 7; i++) {
+      int dayIndex = (currentDayIndex + i) % 7;
+
+      if (dayIndex >= openat.length || dayIndex >= closeat.length) continue;
+
+      int openTime = openat[dayIndex];
+      if (openTime == 0) continue; // Closed this day
+
+      DateTime nextOpen;
+      if (i == 0) {
+        // Same day - check if opening time hasn't passed yet
+        int currentTime = now.hour * 100 + now.minute;
+        if (currentTime < openTime) {
+          // Opens later today
+          int openHour = openTime ~/ 100;
+          int openMinute = openTime % 100;
+          nextOpen = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            openHour,
+            openMinute,
+          );
+        } else {
+          // Already passed today's opening time, check next day
+          continue;
+        }
+      } else {
+        // Future day
+        int openHour = openTime ~/ 100;
+        int openMinute = openTime % 100;
+        DateTime futureDate = now.add(Duration(days: i));
+        nextOpen = DateTime(
+          futureDate.year,
+          futureDate.month,
+          futureDate.day,
+          openHour,
+          openMinute,
+        );
+      }
+
+      Duration difference = nextOpen.difference(now);
+      int hoursUntilOpen = difference.inHours;
+
+      if (hoursUntilOpen < 1) {
+        return 'Currently Closed - Opens in less than 1 hour';
+      } else if (hoursUntilOpen == 1) {
+        return 'Currently Closed - Opens in about 1 hour';
+      } else {
+        return 'Currently Closed - Opens in about $hoursUntilOpen hours';
+      }
+    }
+
+    return 'Currently Closed';
+  }
 }
 
 /* import 'package:geolocator/geolocator.dart';

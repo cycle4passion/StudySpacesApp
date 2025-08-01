@@ -42,7 +42,28 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Library> libraries = [];
+  List<Library> filteredLibraries = [];
   Map<String, bool> favoriteStates = {};
+
+  // Filter states
+  Map<String, bool> filterStates = {
+    'Printers': false,
+    '24/7': false,
+    'Open 2+ hrs': false,
+    'Reservations': false,
+    'Staffed': false,
+    'Silent': false,
+  };
+
+  // ROYGBIV pastel colors for filters
+  Map<String, Color> filterColors = {
+    'Printers': Color(0xFFFFE5E5), // Pastel Red
+    '24/7': Color(0xFFFFE5CC), // Pastel Orange
+    'Open 2+ hrs': Color(0xFFFFFCE5), // Pastel Yellow
+    'Reservations': Color(0xFFE5FFE5), // Pastel Green
+    'Staffed': Color(0xFFE5F3FF), // Pastel Blue
+    'Silent': Color(0xFFEDE5FF), // Pastel Violet
+  };
 
   @override
   void initState() {
@@ -58,12 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
       // Initialize favorite states from library data
       favoriteStates = {for (var lib in libraries) lib.id: lib.isFavorite};
 
-      _sortLibraries();
+      _applyFilters();
     });
   }
 
   void _sortLibraries() {
-    libraries.sort((a, b) {
+    filteredLibraries.sort((a, b) {
       final aFav = favoriteStates[a.id] ?? false;
       final bFav = favoriteStates[b.id] ?? false;
       final aOpen = LibraryUtils.isOpen(a.openat, a.closeat);
@@ -84,6 +105,80 @@ class _HomeScreenState extends State<HomeScreen> {
       // Both closed: sort by name
       return a.name.compareTo(b.name);
     });
+  }
+
+  void _applyFilters() {
+    filteredLibraries = libraries.where((library) {
+      // Check each active filter
+      for (String filterName in filterStates.keys) {
+        if (filterStates[filterName] == true) {
+          if (!_libraryMatchesFilter(library, filterName)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }).toList();
+
+    _sortLibraries();
+  }
+
+  bool _libraryMatchesFilter(Library library, String filterName) {
+    switch (filterName) {
+      case 'Printers':
+        return library.features.any(
+          (feature) => feature.toLowerCase().contains('print'),
+        );
+      case '24/7':
+        return library.features.any(
+          (feature) => feature.toLowerCase().contains('24-hour access'),
+        );
+      case 'Open 2+ hrs':
+        return _libraryOpenForHours(library, 2);
+      case 'Reservations':
+        return library.features.any(
+          (feature) =>
+              feature.toLowerCase().contains('reservable rooms') ||
+              feature.toLowerCase().contains('booking'),
+        );
+      case 'Staffed':
+        return library.features.any(
+          (feature) => feature.toLowerCase().contains('research assistance'),
+        );
+      case 'Silent':
+        return library.features.any(
+          (feature) => feature.toLowerCase().contains('silent study floors'),
+        );
+      default:
+        return true;
+    }
+  }
+
+  bool _libraryOpenForHours(Library library, int hours) {
+    if (!LibraryUtils.isOpen(library.openat, library.closeat)) {
+      return false;
+    }
+
+    final now = DateTime.now();
+    int dayIndex = now.weekday - 1;
+
+    if (dayIndex < 0 || dayIndex >= library.closeat.length) {
+      return false;
+    }
+
+    int closeTime = library.closeat[dayIndex];
+    if (closeTime == 0) return false;
+
+    // Handle overnight closing (closes after midnight)
+    if (closeTime < library.openat[dayIndex]) {
+      // Add 24 hours to closing time for comparison
+      closeTime += 2400;
+    }
+
+    int currentTime = now.hour * 100 + now.minute;
+    int futureTime = currentTime + (hours * 100);
+
+    return futureTime <= closeTime;
   }
 
   @override
@@ -130,20 +225,98 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: libraries.isEmpty
+      body: filteredLibraries.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: libraries.length,
+              padding: EdgeInsets
+                  .zero, // Remove top padding to be flush with app bar
+              itemCount:
+                  filteredLibraries.length + 1, // +1 for the filter accordion
               itemBuilder: (context, index) {
-                final library = libraries[index];
+                // First item is the filter row
+                if (index == 0) {
+                  return Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 2,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 16.0, right: 12.0),
+                          child: Text(
+                            'Filter by',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: SizedBox(
+                            height: 40,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.only(right: 16.0),
+                              child: Row(
+                                children: filterStates.keys.map((filterName) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: FilterChip(
+                                      label: Text(filterName),
+                                      selected:
+                                          filterStates[filterName] ?? false,
+                                      onSelected: (bool selected) {
+                                        setState(() {
+                                          filterStates[filterName] = selected;
+                                          _applyFilters();
+                                        });
+                                      },
+                                      backgroundColor: filterColors[filterName],
+                                      selectedColor: filterColors[filterName]
+                                          ?.withOpacity(0.8),
+                                      checkmarkColor: Colors.black54,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          20.0,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Adjust index for library items
+                final libraryIndex = index - 1;
+                final library = filteredLibraries[libraryIndex];
                 final bool isLibraryOpen = LibraryUtils.isOpen(
                   library.openat,
                   library.closeat,
                 );
 
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
+                  padding: const EdgeInsets.fromLTRB(
+                    16.0,
+                    0,
+                    16.0,
+                    16.0,
+                  ), // No top padding for first library item
                   child: Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
@@ -234,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           .id] ??
                                                       false);
 
-                                              _sortLibraries();
+                                              _applyFilters();
                                             });
                                           },
                                           child: Container(

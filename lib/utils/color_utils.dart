@@ -21,6 +21,15 @@ class ColorUtils {
     }
   }
 
+  /// Returns appropriate text color for fullness tooltip based on background
+  /// Uses a single dark color that provides good contrast on all backgrounds
+  static Color getFullnessTextColor(int fullness) {
+    // Use black/very dark gray that provides good contrast on all colored backgrounds
+    // This works well on yellow, light green, orange, and provides acceptable contrast on green and red
+    return Colors
+        .black87; // Dark color that works reasonably well on all backgrounds
+  }
+
   /// Returns theme-appropriate card background color
   static Color getCardBackgroundColor(BuildContext context, bool isDarkMode) {
     return isDarkMode ? const Color(0xFF2D2D2D) : Colors.white;

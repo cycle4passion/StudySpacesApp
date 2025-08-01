@@ -340,7 +340,10 @@ class LibraryDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Currently Closed',
+                  LibraryUtils.getClosedStatusWithHours(
+                    library.openat,
+                    library.closeat,
+                  ),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Colors.red,

@@ -277,8 +277,10 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                         child: Text(
                           LibraryUtils.getFullnessText(fullnessValue.round()),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: ColorUtils.getFullnessTextColor(
+                              fullnessValue.round(),
+                            ),
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
