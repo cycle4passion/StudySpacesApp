@@ -23,6 +23,19 @@ class HomeScreen extends StatefulWidget {
     this.currentIndex,
   });
 
+  // TODO: darker green for darkmode?
+  // remove weighted average ui/code
+  // filter data as array ["24/7", "Open Now", "Favorites", "Reservations", "Open 2+hrs", "On Campus", "Off Campus"]
+  // accordion for filters
+  // submit space
+  // Pocketbase DB, subscription to fullness (live updates)
+  // backend - construction historic data, updating fullness
+  // add libraries to use apis
+  // load data from apis
+  // login/authentication
+  // leaderboard
+  // UI tweaks
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -44,6 +57,32 @@ class _HomeScreenState extends State<HomeScreen> {
       libraries = cornellLibraries.map((lib) => Library.fromJson(lib)).toList();
       // Initialize favorite states from library data
       favoriteStates = {for (var lib in libraries) lib.id: lib.isFavorite};
+
+      _sortLibraries();
+    });
+  }
+
+  void _sortLibraries() {
+    libraries.sort((a, b) {
+      final aFav = favoriteStates[a.id] ?? false;
+      final bFav = favoriteStates[b.id] ?? false;
+      final aOpen = LibraryUtils.isOpen(a.openat, a.closeat);
+      final bOpen = LibraryUtils.isOpen(b.openat, b.closeat);
+
+      // First priority: Favorites vs non-favorites (among open libraries)
+      if (aOpen && bOpen) {
+        if (aFav && !bFav) return -1;
+        if (!aFav && bFav) return 1;
+        // Both have same favorite status, sort by fullness
+        return a.fullness.compareTo(b.fullness);
+      }
+
+      // Second priority: Open vs closed libraries
+      if (aOpen && !bOpen) return -1;
+      if (!aOpen && bOpen) return 1;
+
+      // Both closed: sort by name
+      return a.name.compareTo(b.name);
     });
   }
 
@@ -88,62 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? 'Switch to Light Mode'
                 : 'Switch to Dark Mode',
             onPressed: widget.onThemeToggle,
-          ),
-          IconButton(
-            icon: const Icon(Icons.calculate, color: Colors.white),
-            tooltip: 'Show Weighted Average',
-            onPressed: () {
-              final result = LibraryUtils.weightedAverageWithDetails([
-                {
-                  'source': 'user',
-                  'value': [5, 3, 3],
-                  'weight': 0.9,
-                  'bump': 0.1,
-                },
-                {
-                  'source': 'reservations',
-                  'value': [12],
-                  'weight': 0.75,
-                  'bump': 0.2,
-                },
-                {
-                  'source': 'history',
-                  'value': [5],
-                  'weight': 0.45,
-                  'bump': 0.05,
-                },
-              ]);
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Weighted Average Result'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Weighted Average: '
-                        '${(result['weightedavg'] * 100).toStringAsFixed(2)}%',
-                      ),
-                      const SizedBox(height: 12),
-                      const Text('Details:'),
-                      ...List.generate(result['details'].length, (i) {
-                        final d = result['details'][i];
-                        return Text(
-                          '${d['source']}: ${(d['avg'] * 100).toStringAsFixed(2)}%',
-                        );
-                      }),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Close'),
-                    ),
-                  ],
-                ),
-              );
-            },
           ),
         ],
       ),
@@ -250,6 +233,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   !(favoriteStates[library
                                                           .id] ??
                                                       false);
+
+                                              _sortLibraries();
                                             });
                                           },
                                           child: Container(
