@@ -36,6 +36,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.2.2 # For persisting user preferences
   url_launcher: ^6.3.1 # For making phone calls and opening URLs
+  webview_flutter: ^4.4.2 # For embedded web content
+  webview_flutter_web: ^0.2.2+4 # Web platform support
+  webview_flutter_android: ^3.12.1 # Android platform support
+  webview_flutter_wkwebview: ^3.9.4 # iOS platform support
 
 dev_dependencies:
   flutter_test:

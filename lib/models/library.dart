@@ -1,5 +1,6 @@
 class Library {
   final String id;
+  final int? reservationid; // Optional reservation ID
   final String name;
   final String description;
   final String image;
@@ -19,6 +20,7 @@ class Library {
 
   Library({
     required this.id,
+    this.reservationid, // Optional parameter
     required this.name,
     required this.description,
     required this.image,
@@ -40,6 +42,7 @@ class Library {
   factory Library.fromJson(Map<String, dynamic> json) {
     return Library(
       id: json['id'],
+      reservationid: json['reservationid'], // Will be null if not present
       name: json['name'],
       description: json['description'],
       image: json['image'],
@@ -62,6 +65,8 @@ class Library {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      if (reservationid != null)
+        'reservationid': reservationid, // Only include if not null
       'name': name,
       'description': description,
       'image': image,

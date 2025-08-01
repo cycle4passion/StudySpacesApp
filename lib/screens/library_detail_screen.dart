@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter/foundation.dart';
 import '../models/library.dart';
 import '../utils/library_utils.dart';
 
@@ -91,11 +93,36 @@ class LibraryDetailScreen extends StatelessWidget {
                     textAlign: TextAlign.justify,
                   ),
                   const SizedBox(height: 32),
-                  Text(
-                    'Library Details',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Library Details',
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      // Show Reserve Space button only if library has reservationid
+                      if (library.reservationid != null)
+                        ElevatedButton.icon(
+                          onPressed: () => _showReservationModal(context),
+                          icon: const Icon(Icons.event_seat, size: 18),
+                          label: const Text('Reserve Space'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   _buildCategoryCard(context),
@@ -614,5 +641,171 @@ class LibraryDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showReservationModal(BuildContext context) {
+    final reservationUrl =
+        'https://spaces.library.cornell.edu/spaces?lid=${library.reservationid}';
+
+    // For web platform, always use external browser due to CORS and iframe restrictions
+    if (kIsWeb) {
+      _openExternalBrowser(context, reservationUrl);
+      return;
+    }
+
+    // For mobile platforms, try webview with fallback
+    _showWebViewOrFallback(context, reservationUrl);
+  }
+
+  void _showWebViewOrFallback(BuildContext context, String url) {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog.fullscreen(
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text('Reserve Space - ${library.name}'),
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                automaticallyImplyLeading: false,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 28),
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: 'Close',
+                  ),
+                ],
+              ),
+              body: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    color: Colors.green.shade100,
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info, color: Colors.green.shade700),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Cornell\'s reservation system - tap the X to return to the app',
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: _buildWebView(url)),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      // If webview fails, fallback to external browser
+      _openExternalBrowser(context, url);
+    }
+  }
+
+  Widget _buildWebView(String url) {
+    try {
+      late final WebViewController controller;
+
+      controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onProgress: (int progress) {
+              // Update loading bar if needed
+            },
+            onPageStarted: (String url) {
+              // Page started loading
+            },
+            onPageFinished: (String url) {
+              // Page finished loading
+            },
+            onWebResourceError: (WebResourceError error) {
+              // Handle errors
+              debugPrint('WebView error: ${error.description}');
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse(url));
+
+      return WebViewWidget(controller: controller);
+    } catch (e) {
+      // Return fallback UI if webview initialization fails
+      return _buildWebViewFallback(url);
+    }
+  }
+
+  Widget _buildWebViewFallback(String url) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.web_asset_off, size: 80, color: Colors.grey),
+            const SizedBox(height: 24),
+            Text(
+              'WebView Not Available',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'The embedded browser is not available on this platform. Please use the external browser option below.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () async {
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              icon: const Icon(Icons.launch),
+              label: const Text('Open in Browser'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openExternalBrowser(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open reservation system'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

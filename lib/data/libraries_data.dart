@@ -24,6 +24,7 @@ const String librariesJson = '''
       },
       {
         "id": "uris",
+        "reservationid": 94,
         "name": "Harold Uris Library",
         "description": "Multi-disciplinary library serving humanities, social sciences, and engineering.",
         "image": "assets/images/uris_library.jpg",
@@ -43,6 +44,7 @@ const String librariesJson = '''
       },
       {
         "id": "mann",
+        "reservationid": 96,
         "name": "Albert R. Mann Library",
         "description": "Life sciences, agriculture, applied social sciences, and human ecology library.",
         "image": "assets/images/mann_library.jpg",
@@ -62,6 +64,7 @@ const String librariesJson = '''
       },
       {
         "id": "engineering",
+        "reservationid": 3403,
         "name": "Engineering Library",
         "description": "Specialized library for engineering students and researchers.",
         "image": "assets/images/engineering_library.jpg",
@@ -154,6 +157,26 @@ const String librariesJson = '''
         "fullness": 3,
         "isFavorite": false,
         "phone": "(607) 255-7236"
+      },
+      {
+        "id": "catherwood",
+        "reservationid": 527,
+        "name": "Martin P. Catherwood Library",
+        "description": "The most comprehensive resource in North America on labor and employment, serving Cornell's ILR School.",
+        "image": "assets/images/catherwood_library.jpg",
+        "category": "Labor & Employment",
+        "address": "229 Ives Hall Tower Road, Ithaca, NY 14853",
+        "latitude": 42.4484,
+        "longitude": -76.4847,
+        "range": 35.0,
+        "openat": [800, 800, 800, 800, 800, 1000, 1200],
+        "closeat": [1700, 1700, 1700, 1700, 1700, 1700, 1700],
+        "features": ["Labor research collections", "Reservable rooms", "Research assistance", "Digital collections", "Kheel Center archives"],
+        "floors": 2,
+        "capacity": 250,
+        "fullness": 2,
+        "isFavorite": false,
+        "phone": "(607) 255-2277"
       }
     ]
   }

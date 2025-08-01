@@ -254,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const Padding(
                           padding: EdgeInsets.only(left: 16.0, right: 12.0),
                           child: Text(
-                            'Filter by',
+                            'Filters:',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 16,
@@ -272,7 +272,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 8.0),
                                     child: FilterChip(
-                                      label: Text(filterName),
+                                      label: Text(
+                                        filterName,
+                                        style: TextStyle(
+                                          color:
+                                              filterStates[filterName] == true
+                                              ? Colors.black87
+                                              : Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                              ? Colors.black87
+                                              : Colors.black87,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
                                       selected:
                                           filterStates[filterName] ?? false,
                                       onSelected: (bool selected) {
@@ -284,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       backgroundColor: filterColors[filterName],
                                       selectedColor: filterColors[filterName]
                                           ?.withOpacity(0.8),
-                                      checkmarkColor: Colors.black54,
+                                      checkmarkColor: Colors.black87,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(
                                           20.0,
@@ -406,8 +418,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   !(favoriteStates[library
                                                           .id] ??
                                                       false);
-
-                                              _applyFilters();
                                             });
                                           },
                                           child: Container(
