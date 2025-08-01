@@ -659,51 +659,24 @@ class LibraryDetailScreen extends StatelessWidget {
 
   void _showWebViewOrFallback(BuildContext context, String url) {
     try {
-      showDialog(
+      showModalBottomSheet(
         context: context,
-        barrierDismissible: false,
+        isScrollControlled: true,
+        isDismissible: false,
+        enableDrag: false,
+        transitionAnimationController: AnimationController(
+          duration: const Duration(milliseconds: 400), // Twice as fast slide up
+          reverseDuration: const Duration(
+            milliseconds: 300,
+          ), // Twice as fast slide down
+          vsync: Navigator.of(context),
+        ),
         builder: (BuildContext context) {
-          return Dialog.fullscreen(
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text('Reserve Space - ${library.name}'),
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                automaticallyImplyLeading: false,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 28),
-                    onPressed: () => Navigator.of(context).pop(),
-                    tooltip: 'Close',
-                  ),
-                ],
-              ),
-              body: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    color: Colors.green.shade100,
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info, color: Colors.green.shade700),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Cornell\'s reservation system - tap the X to return to the app',
-                            style: TextStyle(
-                              color: Colors.green.shade700,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(child: _buildWebView(url)),
-                ],
-              ),
-            ),
+          return SizedBox(
+            height:
+                MediaQuery.of(context).size.height *
+                0.92, // 92% of screen height
+            child: _ReservationModal(library: library, url: url),
           );
         },
       );
@@ -711,6 +684,54 @@ class LibraryDetailScreen extends StatelessWidget {
       // If webview fails, fallback to external browser
       _openExternalBrowser(context, url);
     }
+  }
+
+  void _openExternalBrowser(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open reservation system'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+}
+
+class _ReservationModal extends StatefulWidget {
+  final Library library;
+  final String url;
+
+  const _ReservationModal({required this.library, required this.url});
+
+  @override
+  State<_ReservationModal> createState() => _ReservationModalState();
+}
+
+class _ReservationModalState extends State<_ReservationModal> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Reserve Space - ${widget.library.name}'),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close, size: 28),
+            onPressed: () => Navigator.of(context).pop(),
+            tooltip: 'Close',
+          ),
+        ],
+      ),
+      body: Column(children: [Expanded(child: _buildWebView(widget.url))]),
+    );
   }
 
   Widget _buildWebView(String url) {
@@ -791,21 +812,5 @@ class LibraryDetailScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _openExternalBrowser(BuildContext context, String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not open reservation system'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
   }
 }

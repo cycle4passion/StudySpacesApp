@@ -136,11 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'Open 2+ hrs':
         return _libraryOpenForHours(library, 2);
       case 'Reservations':
-        return library.features.any(
-          (feature) =>
-              feature.toLowerCase().contains('reservable rooms') ||
-              feature.toLowerCase().contains('booking'),
-        );
+        return library.reservationid != null;
       case 'Staffed':
         return library.features.any(
           (feature) => feature.toLowerCase().contains('research assistance'),
@@ -179,6 +175,80 @@ class _HomeScreenState extends State<HomeScreen> {
     int futureTime = currentTime + (hours * 100);
 
     return futureTime <= closeTime;
+  }
+
+  Widget _buildFilterRow() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 16.0, right: 12.0),
+            child: Text(
+              'Filters:',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+            ),
+          ),
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Row(
+                  children: filterStates.keys.map((filterName) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: FilterChip(
+                        label: Text(
+                          filterName,
+                          style: TextStyle(
+                            color: filterStates[filterName] == true
+                                ? Colors.black87
+                                : Theme.of(context).brightness ==
+                                      Brightness.dark
+                                ? Colors.black87
+                                : Colors.black87,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        selected: filterStates[filterName] ?? false,
+                        onSelected: (bool selected) {
+                          setState(() {
+                            filterStates[filterName] = selected;
+                            _applyFilters();
+                          });
+                        },
+                        backgroundColor: filterColors[filterName],
+                        selectedColor: filterColors[filterName]?.withOpacity(
+                          0.8,
+                        ),
+                        checkmarkColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -225,8 +295,47 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: filteredLibraries.isEmpty
+      body: libraries.isEmpty
           ? const Center(child: CircularProgressIndicator())
+          : filteredLibraries.isEmpty
+          ? Column(
+              children: [
+                _buildFilterRow(),
+                Expanded(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 80,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No Libraries Found',
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Try adjusting your filters to see more results.',
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: Colors.grey.shade500),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
           : ListView.builder(
               padding: EdgeInsets
                   .zero, // Remove top padding to be flush with app bar
@@ -235,83 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 // First item is the filter row
                 if (index == 0) {
-                  return Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 2,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(left: 16.0, right: 12.0),
-                          child: Text(
-                            'Filters:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: SizedBox(
-                            height: 40,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              padding: const EdgeInsets.only(right: 16.0),
-                              child: Row(
-                                children: filterStates.keys.map((filterName) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: FilterChip(
-                                      label: Text(
-                                        filterName,
-                                        style: TextStyle(
-                                          color:
-                                              filterStates[filterName] == true
-                                              ? Colors.black87
-                                              : Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                              ? Colors.black87
-                                              : Colors.black87,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      selected:
-                                          filterStates[filterName] ?? false,
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          filterStates[filterName] = selected;
-                                          _applyFilters();
-                                        });
-                                      },
-                                      backgroundColor: filterColors[filterName],
-                                      selectedColor: filterColors[filterName]
-                                          ?.withOpacity(0.8),
-                                      checkmarkColor: Colors.black87,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          20.0,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  return _buildFilterRow();
                 }
 
                 // Adjust index for library items
@@ -547,28 +580,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           8,
                                                         ),
                                                   ),
-                                                  child: Image.asset(
-                                                    'assets/icon/report.png',
-                                                    width: 20,
-                                                    height: 20,
-                                                    fit: BoxFit.contain,
-                                                    filterQuality:
-                                                        FilterQuality.high,
-                                                    isAntiAlias: true,
-                                                    errorBuilder:
-                                                        (
-                                                          context,
-                                                          error,
-                                                          stackTrace,
-                                                        ) {
-                                                          return Icon(
-                                                            Icons.report,
-                                                            size: 20,
-                                                            color: Colors
-                                                                .green
-                                                                .shade700,
-                                                          );
-                                                        },
+                                                  child: Icon(
+                                                    Icons.campaign,
+                                                    size: 28,
+                                                    color:
+                                                        Colors.green.shade700,
                                                   ),
                                                 ),
                                               ),
