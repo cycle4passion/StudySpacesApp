@@ -235,6 +235,134 @@ class LibraryUtils {
 
     return 'Currently Closed';
   }
+
+  /// Returns time status text like "Closes in about 2 hrs" or "Opens in about 6 hrs"
+  static String getTimeStatusText(List<int> openat, List<int> closeat) {
+    final now = DateTime.now();
+    int dayIndex = now.weekday - 1;
+    int currentTime = now.hour * 100 + now.minute;
+
+    // Check if arrays are valid and day exists
+    if (dayIndex < 0 ||
+        dayIndex >= openat.length ||
+        dayIndex >= closeat.length) {
+      return 'Closed';
+    }
+
+    int openTime = openat[dayIndex];
+    int closeTime = closeat[dayIndex];
+
+    // If either time is 0, the library is closed that day
+    if (openTime == 0 || closeTime == 0) {
+      // Find next opening day
+      for (int i = 1; i <= 7; i++) {
+        int nextDayIndex = (dayIndex + i) % 7;
+        if (nextDayIndex < openat.length &&
+            nextDayIndex < closeat.length &&
+            openat[nextDayIndex] != 0 &&
+            closeat[nextDayIndex] != 0) {
+          int hoursUntilOpen =
+              (i * 24) - now.hour + (openat[nextDayIndex] ~/ 100);
+          if (hoursUntilOpen < 24) {
+            return 'Opens in about ${hoursUntilOpen} hrs';
+          } else {
+            int days = hoursUntilOpen ~/ 24;
+            return 'Opens in ${days} day${days == 1 ? '' : 's'}';
+          }
+        }
+      }
+      return 'Closed';
+    }
+
+    bool isCurrentlyOpen = isOpen(openat, closeat);
+
+    if (isCurrentlyOpen) {
+      // Calculate time until closing
+      int closeHour = closeTime ~/ 100;
+      int closeMinute = closeTime % 100;
+
+      DateTime closeDateTime;
+      if (closeTime < openTime) {
+        // Closes after midnight (next day)
+        closeDateTime = DateTime(
+          now.year,
+          now.month,
+          now.day + 1,
+          closeHour,
+          closeMinute,
+        );
+      } else {
+        // Closes same day
+        closeDateTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          closeHour,
+          closeMinute,
+        );
+      }
+
+      Duration timeUntilClose = closeDateTime.difference(now);
+      int hoursUntilClose = timeUntilClose.inHours;
+      int minutesUntilClose = timeUntilClose.inMinutes % 60;
+
+      if (hoursUntilClose < 1) {
+        if (minutesUntilClose < 10) {
+          return 'Closes soon';
+        } else {
+          return 'Closes in ${minutesUntilClose} min';
+        }
+      } else if (hoursUntilClose < 2) {
+        return 'Closes in about 1 hr';
+      } else {
+        return 'Closes in about ${hoursUntilClose} hrs';
+      }
+    } else {
+      // Library is closed, calculate time until opening
+      int openHour = openTime ~/ 100;
+      int openMinute = openTime % 100;
+
+      DateTime openDateTime;
+      if (currentTime > closeTime && closeTime < openTime) {
+        // Same day opening (we're between close and open time for overnight schedule)
+        openDateTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          openHour,
+          openMinute,
+        );
+      } else {
+        // Next day opening
+        openDateTime = DateTime(
+          now.year,
+          now.month,
+          now.day + 1,
+          openHour,
+          openMinute,
+        );
+      }
+
+      Duration timeUntilOpen = openDateTime.difference(now);
+      int hoursUntilOpen = timeUntilOpen.inHours;
+
+      if (hoursUntilOpen < 1) {
+        int minutesUntilOpen = timeUntilOpen.inMinutes;
+        if (minutesUntilOpen < 10) {
+          return 'Opens soon';
+        } else {
+          return 'Opens in ${minutesUntilOpen} min';
+        }
+      } else if (hoursUntilOpen < 2) {
+        return 'Opens in about 1 hr';
+      } else if (hoursUntilOpen < 24) {
+        return 'Opens in about ${hoursUntilOpen} hrs';
+      } else {
+        int days = hoursUntilOpen ~/ 24;
+        return 'Opens in ${days} day${days == 1 ? '' : 's'}';
+      }
+    }
+  }
 }
 
 /* import 'package:geolocator/geolocator.dart';

@@ -131,10 +131,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           // Segmented Control
           Container(
             margin: const EdgeInsets.fromLTRB(
-              12, // Reduced from 16
-              12, // Reduced from 16
-              12, // Reduced from 16
-              6, // Reduced from 8
+              8, // Reduced from 12
+              8, // Reduced from 12
+              8, // Reduced from 12
+              4, // Reduced from 6
             ),
             padding: const EdgeInsets.all(4), // Reduced from 6
             decoration: BoxDecoration(
@@ -143,13 +143,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               ), // Very light green instead of grey
               borderRadius: BorderRadius.circular(25),
               border: Border.all(color: Colors.grey.shade300, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: Theme.of(context).brightness == Brightness.dark
+                  ? [] // Remove shadows in dark mode to eliminate halo effect
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -159,7 +161,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 final selectedIndex = periods.indexOf(selectedPeriod);
 
                 return SizedBox(
-                  height: 44, // Fixed height for the entire segmented control
+                  height: 52, // Increased from 44 for larger touch targets
                   child: Stack(
                     children: [
                       // Animated background pill
@@ -175,19 +177,26 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.green,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.green.withValues(alpha: 0.4),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                blurRadius: 4,
-                                offset: const Offset(0, -1),
-                              ),
-                            ],
+                            borderRadius: BorderRadius.circular(26),
+                            boxShadow:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? [] // Remove shadows in dark mode to eliminate halo effect
+                                : [
+                                    BoxShadow(
+                                      color: Colors.green.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                    BoxShadow(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, -1),
+                                    ),
+                                  ],
                           ),
                         ),
                       ),
@@ -197,7 +206,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                           final isSelected = selectedPeriod == period;
                           return SizedBox(
                             width: itemWidth, // Fixed width for each button
-                            height: 44, // Match the container height
+                            height:
+                                52, // Increased from 44 for larger touch targets
                             child: MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
@@ -247,18 +257,26 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   16,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20),
+                  border: Theme.of(context).brightness == Brightness.dark
+                      ? Border.all(
+                          color: Colors.grey.withValues(alpha: 0.3),
+                          width: 1,
+                        )
+                      : null,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.1),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black.withValues(alpha: 0.3)
+                          : Colors.grey.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(8), // Reduced from 12
+                  padding: const EdgeInsets.all(4), // Reduced from 8
                   itemCount: currentLeaderboard.length,
                   separatorBuilder: (context, index) => Divider(
                     color: Colors.grey.shade200,
@@ -271,10 +289,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                        vertical: 4,
-                      ), // Reduced from 8
+                        vertical: 2,
+                      ), // Reduced from 4
                       decoration: BoxDecoration(
-                        color: Colors.white, // Remove colored backgrounds
+                        color: Theme.of(
+                          context,
+                        ).cardColor, // Use theme-aware card color
                         borderRadius: rank == 1
                             ? const BorderRadius.only(
                                 topLeft: Radius.circular(16),
@@ -289,7 +309,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8, // Reduced from 12
+                          horizontal: 1, // Reduced from 2
                           vertical: 0, // Reduced from 2
                         ),
                         leading: Row(

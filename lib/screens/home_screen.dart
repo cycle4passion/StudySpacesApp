@@ -11,6 +11,7 @@ class HomeScreen extends StatefulWidget {
   final VoidCallback onThemeToggle;
   final bool isDarkMode;
   final VoidCallback onHomePressed;
+  final VoidCallback? onReportPressed; // Add this property
   final Function(int)? onTabTapped;
   final int? currentIndex;
 
@@ -19,6 +20,7 @@ class HomeScreen extends StatefulWidget {
     required this.onThemeToggle,
     required this.isDarkMode,
     required this.onHomePressed,
+    this.onReportPressed, // Add this parameter
     this.onTabTapped,
     this.currentIndex,
   });
@@ -47,20 +49,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Filter states
   Map<String, bool> filterStates = {
-    'Printers': false,
     '24/7': false,
     'Open 2+ hrs': false,
     'Reservations': false,
+    'Printers': false,
     'Staffed': false,
     'Silent': false,
   };
 
   // ROYGBIV pastel colors for filters
   Map<String, Color> filterColors = {
-    'Printers': Color(0xFFFFE5E5), // Pastel Red
-    '24/7': Color(0xFFFFE5CC), // Pastel Orange
-    'Open 2+ hrs': Color(0xFFFFFCE5), // Pastel Yellow
-    'Reservations': Color(0xFFE5FFE5), // Pastel Green
+    '24/7': Color(0xFFFFE5E5), // Pastel Red
+    'Open 2+ hrs': Color(0xFFFFE5CC), // Pastel Orange
+    'Reservations': Color(0xFFFFFCE5), // Pastel Yellow
+    'Printers': Color(0xFFE5FFE5), // Pastel Green
     'Staffed': Color(0xFFE5F3FF), // Pastel Blue
     'Silent': Color(0xFFEDE5FF), // Pastel Violet
   };
@@ -525,12 +527,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      // First row: Library name and report button
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
-                                            flex: 2,
                                             child: Text(
                                               library.name,
                                               overflow: TextOverflow.ellipsis,
@@ -547,98 +547,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 8),
-                                          Flexible(
-                                            flex: 1,
-                                            child: Text(
-                                              LibraryUtils.getStatusText(
-                                                library.openat,
-                                                library.closeat,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              textAlign: TextAlign.end,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                    color: Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Flexible(
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 4,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                    .withValues(alpha: 0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Text(
-                                                library.category,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          // Only show report button if library is open
                                           if (isLibraryOpen)
                                             Tooltip(
-                                              message: 'Report on Fullness',
+                                              message:
+                                                  'Report capacity for ${library.name}',
                                               child: GestureDetector(
                                                 onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ReportScreen(
-                                                            onHomePressed: widget
-                                                                .onHomePressed,
-                                                            preSelectedLibrary:
-                                                                library,
-                                                          ),
-                                                    ),
-                                                  );
+                                                  widget.onReportPressed
+                                                      ?.call();
                                                 },
                                                 child: Container(
                                                   padding: const EdgeInsets.all(
                                                     8,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.green
-                                                        .withValues(alpha: 0.1),
+                                                    color: Colors.green,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           16,
                                                         ),
                                                   ),
-                                                  child: Icon(
+                                                  child: const Icon(
                                                     Icons.campaign,
-                                                    size: 28,
-                                                    color:
-                                                        Colors.green.shade700,
+                                                    color: Colors.white,
+                                                    size: 20,
                                                   ),
                                                 ),
                                               ),
@@ -693,63 +625,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           // If library is closed, use a spacer to push content right
                                           if (!isLibraryOpen) const Spacer(),
-                                          // Right side - Capacity and floors
-                                          Flexible(
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons.people,
-                                                  size: 16,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface
-                                                      .withValues(alpha: 0.6),
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Flexible(
-                                                  child: Text(
-                                                    'Capacity ${library.capacity}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface
-                                                          .withValues(
-                                                            alpha: 0.6,
-                                                          ),
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                Icon(
-                                                  Icons.layers,
-                                                  size: 16,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface
-                                                      .withValues(alpha: 0.6),
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Flexible(
-                                                  child: Text(
-                                                    '${library.floors} Floor${library.floors == 1 ? '' : 's'}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface
-                                                          .withValues(
-                                                            alpha: 0.6,
-                                                          ),
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                          // Right side - Time status
+                                          Text(
+                                            LibraryUtils.getTimeStatusText(
+                                              library.openat,
+                                              library.closeat,
+                                            ),
+                                            style: TextStyle(
+                                              color: isLibraryOpen
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ],
@@ -761,21 +648,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        // Diagonal "CLOSED" overlay for closed libraries
-                        if (!isLibraryOpen)
-                          Positioned.fill(
-                            child: IgnorePointer(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                ),
-                                child: CustomPaint(
-                                  painter: DiagonalTextPainter(),
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -784,44 +656,4 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
     );
   }
-}
-
-// Custom painter for diagonal "CLOSED" text
-class DiagonalTextPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Calculate text position and rotation
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: 'CLOSED',
-        style: TextStyle(
-          color: Colors.red.withValues(alpha: 0.3),
-          fontSize: 96,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-
-    textPainter.layout();
-
-    // Save canvas state
-    canvas.save();
-
-    // Move to center and rotate
-    canvas.translate(size.width / 2, size.height / 2);
-    canvas.rotate(-0.5); // Rotate -30 degrees
-
-    // Draw text centered
-    textPainter.paint(
-      canvas,
-      Offset(-textPainter.width / 2, -textPainter.height / 2),
-    );
-
-    // Restore canvas state
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

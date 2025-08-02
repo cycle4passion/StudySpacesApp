@@ -40,6 +40,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         onThemeToggle: widget.onThemeToggle,
         isDarkMode: widget.isDarkMode,
         onHomePressed: _goToHome,
+        onReportPressed: () => _onTabTapped(1), // Navigate to report tab
+        onTabTapped: _onTabTapped,
+        currentIndex: _currentIndex,
       ),
       ReportScreen(onHomePressed: _goToHome),
       LeaderboardScreen(onHomePressed: _goToHome),
