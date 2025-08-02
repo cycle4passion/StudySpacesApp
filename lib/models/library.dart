@@ -86,3 +86,58 @@ class Library {
     };
   }
 }
+
+class LeaderboardEntry {
+  final String name;
+  final int reports;
+
+  LeaderboardEntry({required this.name, required this.reports});
+
+  factory LeaderboardEntry.fromJson(Map<String, dynamic> json) {
+    return LeaderboardEntry(name: json['name'], reports: json['reports']);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'reports': reports};
+  }
+}
+
+class Leaderboard {
+  final List<LeaderboardEntry> day;
+  final List<LeaderboardEntry> week;
+  final List<LeaderboardEntry> month;
+  final List<LeaderboardEntry> alltime;
+
+  Leaderboard({
+    required this.day,
+    required this.week,
+    required this.month,
+    required this.alltime,
+  });
+
+  factory Leaderboard.fromJson(Map<String, dynamic> json) {
+    return Leaderboard(
+      day: (json['day'] as List)
+          .map((entry) => LeaderboardEntry.fromJson(entry))
+          .toList(),
+      week: (json['week'] as List)
+          .map((entry) => LeaderboardEntry.fromJson(entry))
+          .toList(),
+      month: (json['month'] as List)
+          .map((entry) => LeaderboardEntry.fromJson(entry))
+          .toList(),
+      alltime: (json['alltime'] as List)
+          .map((entry) => LeaderboardEntry.fromJson(entry))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'day': day.map((entry) => entry.toJson()).toList(),
+      'week': week.map((entry) => entry.toJson()).toList(),
+      'month': month.map((entry) => entry.toJson()).toList(),
+      'alltime': alltime.map((entry) => entry.toJson()).toList(),
+    };
+  }
+}

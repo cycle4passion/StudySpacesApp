@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'report_screen.dart';
+import 'leaderboard_screen.dart';
 import 'profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -39,10 +40,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         onThemeToggle: widget.onThemeToggle,
         isDarkMode: widget.isDarkMode,
         onHomePressed: _goToHome,
-        onTabTapped: _onTabTapped,
-        currentIndex: _currentIndex,
       ),
       ReportScreen(onHomePressed: _goToHome),
+      LeaderboardScreen(onHomePressed: _goToHome),
       ProfileScreen(onHomePressed: _goToHome),
     ];
 
@@ -61,7 +61,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Report'),
+          BottomNavigationBarItem(icon: Icon(Icons.campaign), label: 'Report'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.leaderboard),
+            label: 'Leaderboard',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

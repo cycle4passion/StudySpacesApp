@@ -179,6 +179,56 @@ const String librariesJson = '''
         "phone": "(607) 255-2277"
       }
     ]
+  },
+  "leaderboard": {
+    "day": [
+      {"name": "j1843", "reports": 9},
+      {"name": "m2947", "reports": 8},
+      {"name": "k5729", "reports": 7},
+      {"name": "a3156", "reports": 6},
+      {"name": "r8491", "reports": 5},
+      {"name": "s7234", "reports": 4},
+      {"name": "d6082", "reports": 3},
+      {"name": "l9375", "reports": 2},
+      {"name": "p4618", "reports": 1},
+      {"name": "t1529", "reports": 1}
+    ],
+    "week": [
+      {"name": "j1843", "reports": 23},
+      {"name": "m2947", "reports": 19},
+      {"name": "k5729", "reports": 16},
+      {"name": "a3156", "reports": 14},
+      {"name": "r8491", "reports": 12},
+      {"name": "s7234", "reports": 10},
+      {"name": "d6082", "reports": 8},
+      {"name": "l9375", "reports": 6},
+      {"name": "p4618", "reports": 4},
+      {"name": "t1529", "reports": 3}
+    ],
+    "month": [
+      {"name": "j1843", "reports": 94},
+      {"name": "m2947", "reports": 87},
+      {"name": "k5729", "reports": 73},
+      {"name": "a3156", "reports": 66},
+      {"name": "r8491", "reports": 59},
+      {"name": "s7234", "reports": 45},
+      {"name": "d6082", "reports": 38},
+      {"name": "l9375", "reports": 29},
+      {"name": "p4618", "reports": 21},
+      {"name": "t1529", "reports": 15}
+    ],
+    "alltime": [
+      {"name": "j1843", "reports": 987},
+      {"name": "m2947", "reports": 834},
+      {"name": "k5729", "reports": 729},
+      {"name": "a3156", "reports": 651},
+      {"name": "r8491", "reports": 578},
+      {"name": "s7234", "reports": 492},
+      {"name": "d6082", "reports": 416},
+      {"name": "l9375", "reports": 353},
+      {"name": "p4618", "reports": 287},
+      {"name": "t1529", "reports": 194}
+    ]
   }
 }
 ''';

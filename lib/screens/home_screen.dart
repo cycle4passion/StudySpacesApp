@@ -577,7 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         .withValues(alpha: 0.1),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                          8,
+                                                          16,
                                                         ),
                                                   ),
                                                   child: Icon(
