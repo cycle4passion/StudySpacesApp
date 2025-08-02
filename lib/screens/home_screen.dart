@@ -195,11 +195,51 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           const Padding(
-            padding: EdgeInsets.only(left: 16.0, right: 12.0),
+            padding: EdgeInsets.only(left: 16.0, right: 8.0),
             child: Text(
               'Filters:',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
+          ),
+          // Clear filters button - always takes up space but only shows when filters are active
+          Container(
+            width: 20, // Fixed width to preserve space
+            height: 20,
+            margin: const EdgeInsets.only(right: 8.0),
+            child: filterStates.values.any((isActive) => isActive == true)
+                ? Tooltip(
+                    message: 'Clear Filters',
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          hoverColor: Colors.red.withValues(alpha: 0.1),
+                          onTap: () {
+                            setState(() {
+                              // Clear all filters
+                              for (String key in filterStates.keys) {
+                                filterStates[key] = false;
+                              }
+                              _applyFilters();
+                            });
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(
+                              2.0,
+                            ), // Much smaller padding
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.red,
+                              size: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : null, // Invisible but preserves space
           ),
           Expanded(
             child: SizedBox(
@@ -490,8 +530,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
+                                            flex: 2,
                                             child: Text(
                                               library.name,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall
@@ -503,20 +546,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   ),
                                             ),
                                           ),
-                                          Text(
-                                            LibraryUtils.getStatusText(
-                                              library.openat,
-                                              library.closeat,
+                                          const SizedBox(width: 8),
+                                          Flexible(
+                                            flex: 1,
+                                            child: Text(
+                                              LibraryUtils.getStatusText(
+                                                library.openat,
+                                                library.closeat,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              textAlign: TextAlign.end,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                             ),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
                                           ),
                                         ],
                                       ),
@@ -525,27 +575,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                                  .withValues(alpha: 0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              library.category,
-                                              style: TextStyle(
-                                                color: Theme.of(
-                                                  context,
-                                                ).colorScheme.primary,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12,
+                                          Flexible(
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 4,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                    .withValues(alpha: 0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: Text(
+                                                library.category,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -598,80 +652,105 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: [
                                           // Left side - Fullness indicator (only if library is open)
                                           if (isLibraryOpen)
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  width: 12,
-                                                  height: 12,
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        ColorUtils.getFullnessColor(
-                                                          library.fullness,
-                                                        ),
-                                                    shape: BoxShape.circle,
+                                            Flexible(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    width: 12,
+                                                    height: 12,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          ColorUtils.getFullnessColor(
+                                                            library.fullness,
+                                                          ),
+                                                      shape: BoxShape.circle,
+                                                    ),
                                                   ),
-                                                ),
-                                                const SizedBox(width: 6),
-                                                Text(
-                                                  LibraryUtils.getFullnessText(
-                                                    library.fullness,
+                                                  const SizedBox(width: 6),
+                                                  Flexible(
+                                                    child: Text(
+                                                      LibraryUtils.getFullnessText(
+                                                        library.fullness,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface
+                                                            .withValues(
+                                                              alpha: 0.8,
+                                                            ),
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
                                                   ),
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurface
-                                                        .withValues(alpha: 0.8),
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           // If library is closed, use a spacer to push content right
                                           if (!isLibraryOpen) const Spacer(),
                                           // Right side - Capacity and floors
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.people,
-                                                size: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface
-                                                    .withValues(alpha: 0.6),
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                'Capacity ${library.capacity}',
-                                                style: TextStyle(
+                                          Flexible(
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.people,
+                                                  size: 16,
                                                   color: Theme.of(context)
                                                       .colorScheme
                                                       .onSurface
                                                       .withValues(alpha: 0.6),
-                                                  fontSize: 12,
                                                 ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Icon(
-                                                Icons.layers,
-                                                size: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface
-                                                    .withValues(alpha: 0.6),
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                '${library.floors} Floor${library.floors == 1 ? '' : 's'}',
-                                                style: TextStyle(
+                                                const SizedBox(width: 4),
+                                                Flexible(
+                                                  child: Text(
+                                                    'Capacity ${library.capacity}',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(
+                                                            alpha: 0.6,
+                                                          ),
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Icon(
+                                                  Icons.layers,
+                                                  size: 16,
                                                   color: Theme.of(context)
                                                       .colorScheme
                                                       .onSurface
                                                       .withValues(alpha: 0.6),
-                                                  fontSize: 12,
                                                 ),
-                                              ),
-                                            ],
+                                                const SizedBox(width: 4),
+                                                Flexible(
+                                                  child: Text(
+                                                    '${library.floors} Floor${library.floors == 1 ? '' : 's'}',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(
+                                                            alpha: 0.6,
+                                                          ),
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
