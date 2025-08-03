@@ -264,7 +264,7 @@ class LibraryUtils {
           // Calculate the exact time until opening
           int openHour = openat[nextDayIndex] ~/ 100;
           int openMinute = openat[nextDayIndex] % 100;
-          
+
           // Create the target opening datetime
           DateTime nextOpenDateTime = DateTime(
             now.year,
@@ -273,11 +273,11 @@ class LibraryUtils {
             openHour,
             openMinute,
           );
-          
+
           // Calculate the difference
           Duration timeUntilOpen = nextOpenDateTime.difference(now);
           int hoursUntilOpen = timeUntilOpen.inHours;
-          
+
           if (hoursUntilOpen < 24) {
             return 'Opens in about ${hoursUntilOpen} hrs';
           } else {
@@ -338,13 +338,13 @@ class LibraryUtils {
       int openMinute = openTime % 100;
 
       DateTime openDateTime;
-      
+
       // Handle different scenarios for overnight schedules
       if (closeTime < openTime) {
         // This is an overnight schedule (e.g., 10am-2am)
         if (currentTime <= closeTime) {
           // We're in the early morning, still part of "yesterday's" session
-          // But we should calculate when it opens "today" 
+          // But we should calculate when it opens "today"
           openDateTime = DateTime(
             now.year,
             now.month,

@@ -446,7 +446,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            '${entry.reports}',
+                            '${entry.reports} ${entry.reports == 1 ? 'Report' : 'Reports'}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13, // Reduced from 14
