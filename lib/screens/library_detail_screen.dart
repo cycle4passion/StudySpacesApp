@@ -178,26 +178,7 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
                   const SizedBox(height: 16),
                   _buildCategoryCard(context),
                   const SizedBox(height: 12),
-                  // Show "Currently Closed" if library is not open
-                  if (!LibraryUtils.isOpen(
-                    widget.library.openat,
-                    widget.library.closeat,
-                  ))
-                    _buildClosedCard(context),
-                  if (!LibraryUtils.isOpen(
-                    widget.library.openat,
-                    widget.library.closeat,
-                  ))
-                    const SizedBox(height: 12),
-                  _buildDetailCard(
-                    context,
-                    Icons.schedule,
-                    'Hours',
-                    LibraryUtils.formatHours(
-                      widget.library.openat,
-                      widget.library.closeat,
-                    ),
-                  ),
+                  _buildEnhancedHoursCard(context),
                   const SizedBox(height: 12),
                   _buildDetailCard(
                     context,
@@ -381,7 +362,16 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
     );
   }
 
-  Widget _buildClosedCard(BuildContext context) {
+  Widget _buildEnhancedHoursCard(BuildContext context) {
+    final isOpen = LibraryUtils.isOpen(
+      widget.library.openat,
+      widget.library.closeat,
+    );
+    final statusText = LibraryUtils.getTimeStatusText(
+      widget.library.openat,
+      widget.library.closeat,
+    );
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -389,7 +379,6 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
             ? const Color(0xFF2D2D2D)
             : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.3), width: 1),
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).brightness == Brightness.dark
@@ -401,47 +390,183 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(Icons.access_time_filled, color: Colors.red, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Status',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isOpen
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  LibraryUtils.getClosedStatusWithHours(
-                    widget.library.openat,
-                    widget.library.closeat,
-                  ),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.red,
-                  ),
+                child: Icon(
+                  Icons.schedule,
+                  color: isOpen ? Colors.green : Colors.red,
+                  size: 24,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hours',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isOpen ? Colors.green : Colors.red,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            isOpen ? 'OPEN' : 'CLOSED',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            statusText,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: isOpen ? Colors.green : Colors.red,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 12),
+          _buildWeeklyHours(context),
         ],
       ),
     );
+  }
+
+  Widget _buildWeeklyHours(BuildContext context) {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final now = DateTime.now();
+    final currentDayIndex = now.weekday - 1; // 0 = Monday, 6 = Sunday
+
+    return Column(
+      children: List.generate(days.length, (index) {
+        if (index >= widget.library.openat.length ||
+            index >= widget.library.closeat.length) {
+          return const SizedBox.shrink();
+        }
+
+        final isToday = index == currentDayIndex;
+        final openTime = widget.library.openat[index];
+        final closeTime = widget.library.closeat[index];
+
+        // For today, check if library is actually open right now
+        final bool isTodayAndClosed = isToday && !LibraryUtils.isOpen(
+          widget.library.openat,
+          widget.library.closeat,
+        );
+
+        String hoursText;
+        if (openTime == 0 || closeTime == 0) {
+          hoursText = 'Closed';
+        } else {
+          hoursText =
+              '${_formatMilitaryTime(openTime)} - ${_formatMilitaryTime(closeTime)}';
+        }
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 4),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isToday
+                ? (isTodayAndClosed
+                      ? Colors.red.withValues(alpha: 0.1)
+                      : Colors.green.withValues(alpha: 0.1))
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: isToday
+                ? Border.all(
+                    color: isTodayAndClosed
+                        ? Colors.red.withValues(alpha: 0.3)
+                        : Colors.green.withValues(alpha: 0.3),
+                    width: 1,
+                  )
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                days[index],
+                style: TextStyle(
+                  fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                  color: isToday
+                      ? (isTodayAndClosed ? Colors.red : Colors.green)
+                      : (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade300
+                            : Colors.grey.shade700),
+                ),
+              ),
+              Text(
+                hoursText,
+                style: TextStyle(
+                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                  color: isToday
+                      ? (isTodayAndClosed ? Colors.red : Colors.green)
+                      : (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey.shade300
+                            : Colors.grey.shade700),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  /// Helper function to convert military time to readable format
+  String _formatMilitaryTime(int militaryTime) {
+    if (militaryTime == 0) return 'Closed';
+    if (militaryTime == 2400) return '12:00 AM';
+
+    int hours = militaryTime ~/ 100;
+    int minutes = militaryTime % 100;
+
+    if (hours == 0) {
+      return '12:${minutes.toString().padLeft(2, '0')} AM';
+    } else if (hours < 12) {
+      return '$hours:${minutes.toString().padLeft(2, '0')} AM';
+    } else if (hours == 12) {
+      return '12:${minutes.toString().padLeft(2, '0')} PM';
+    } else {
+      return '${hours - 12}:${minutes.toString().padLeft(2, '0')} PM';
+    }
   }
 
   Widget _buildCategoryCard(BuildContext context) {
