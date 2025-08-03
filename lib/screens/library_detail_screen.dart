@@ -178,17 +178,6 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
                   const SizedBox(height: 16),
                   _buildCategoryCard(context),
                   const SizedBox(height: 12),
-                  // Show "Currently Closed" if library is not open
-                  if (!LibraryUtils.isOpen(
-                    widget.library.openat,
-                    widget.library.closeat,
-                  ))
-                    _buildClosedCard(context),
-                  if (!LibraryUtils.isOpen(
-                    widget.library.openat,
-                    widget.library.closeat,
-                  ))
-                    const SizedBox(height: 12),
                   _buildEnhancedHoursCard(context),
                   const SizedBox(height: 12),
                   _buildDetailCard(
@@ -373,69 +362,6 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
     );
   }
 
-  Widget _buildClosedCard(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF2D2D2D)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.3), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(Icons.access_time_filled, color: Colors.red, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Status',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  LibraryUtils.getClosedStatusWithHours(
-                    widget.library.openat,
-                    widget.library.closeat,
-                  ),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildEnhancedHoursCard(BuildContext context) {
     final isOpen = LibraryUtils.isOpen(
       widget.library.openat,
@@ -567,6 +493,12 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
               '${_formatMilitaryTime(openTime)} - ${_formatMilitaryTime(closeTime)}';
         }
 
+        // Check if library is currently open (for today's highlighting)
+        final isCurrentlyOpen = LibraryUtils.isOpen(
+          widget.library.openat,
+          widget.library.closeat,
+        );
+
         return Container(
           margin: const EdgeInsets.only(bottom: 4),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -574,14 +506,18 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
             color: isToday
                 ? (openTime == 0 || closeTime == 0
                       ? Colors.red.withValues(alpha: 0.1)
-                      : Colors.green.withValues(alpha: 0.1))
+                      : (isCurrentlyOpen
+                            ? Colors.green.withValues(alpha: 0.1)
+                            : Colors.red.withValues(alpha: 0.1)))
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: isToday
                 ? Border.all(
                     color: openTime == 0 || closeTime == 0
                         ? Colors.red.withValues(alpha: 0.3)
-                        : Colors.green.withValues(alpha: 0.3),
+                        : (isCurrentlyOpen
+                              ? Colors.green.withValues(alpha: 0.3)
+                              : Colors.red.withValues(alpha: 0.3)),
                     width: 1,
                   )
                 : null,
@@ -596,7 +532,7 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
                   color: isToday
                       ? (openTime == 0 || closeTime == 0
                             ? Colors.red
-                            : Colors.green)
+                            : (isCurrentlyOpen ? Colors.green : Colors.red))
                       : (Theme.of(context).brightness == Brightness.dark
                             ? Colors.grey.shade300
                             : Colors.grey.shade700),
@@ -609,7 +545,7 @@ class _LibraryDetailScreenState extends State<LibraryDetailScreen>
                   color: isToday
                       ? (openTime == 0 || closeTime == 0
                             ? Colors.red
-                            : Colors.green)
+                            : (isCurrentlyOpen ? Colors.green : Colors.red))
                       : (Theme.of(context).brightness == Brightness.dark
                             ? Colors.grey.shade300
                             : Colors.grey.shade700),

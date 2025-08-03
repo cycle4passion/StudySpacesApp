@@ -261,8 +261,23 @@ class LibraryUtils {
             nextDayIndex < closeat.length &&
             openat[nextDayIndex] != 0 &&
             closeat[nextDayIndex] != 0) {
-          int hoursUntilOpen =
-              (i * 24) - now.hour + (openat[nextDayIndex] ~/ 100);
+          // Calculate the exact time until opening
+          int openHour = openat[nextDayIndex] ~/ 100;
+          int openMinute = openat[nextDayIndex] % 100;
+          
+          // Create the target opening datetime
+          DateTime nextOpenDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day + i,
+            openHour,
+            openMinute,
+          );
+          
+          // Calculate the difference
+          Duration timeUntilOpen = nextOpenDateTime.difference(now);
+          int hoursUntilOpen = timeUntilOpen.inHours;
+          
           if (hoursUntilOpen < 24) {
             return 'Opens in about ${hoursUntilOpen} hrs';
           } else {
@@ -323,24 +338,61 @@ class LibraryUtils {
       int openMinute = openTime % 100;
 
       DateTime openDateTime;
-      if (currentTime > closeTime && closeTime < openTime) {
-        // Same day opening (we're between close and open time for overnight schedule)
-        openDateTime = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          openHour,
-          openMinute,
-        );
+      
+      // Handle different scenarios for overnight schedules
+      if (closeTime < openTime) {
+        // This is an overnight schedule (e.g., 10am-2am)
+        if (currentTime <= closeTime) {
+          // We're in the early morning, still part of "yesterday's" session
+          // But we should calculate when it opens "today" 
+          openDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            openHour,
+            openMinute,
+          );
+        } else if (currentTime >= openTime) {
+          // We're after opening time but before closing time - this shouldn't happen as isOpen would be true
+          // But just in case, open tomorrow
+          openDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day + 1,
+            openHour,
+            openMinute,
+          );
+        } else {
+          // We're between closing time and opening time (e.g., 3am-9am on a 10am-2am schedule)
+          openDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            openHour,
+            openMinute,
+          );
+        }
       } else {
-        // Next day opening
-        openDateTime = DateTime(
-          now.year,
-          now.month,
-          now.day + 1,
-          openHour,
-          openMinute,
-        );
+        // Normal same-day schedule (e.g., 8am-10pm)
+        if (currentTime < openTime) {
+          // Before opening time today
+          openDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            openHour,
+            openMinute,
+          );
+        } else {
+          // After closing time today, opens tomorrow
+          openDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day + 1,
+            openHour,
+            openMinute,
+          );
+        }
       }
 
       Duration timeUntilOpen = openDateTime.difference(now);

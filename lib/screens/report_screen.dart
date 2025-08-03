@@ -326,7 +326,10 @@ class _ReportScreenState extends State<ReportScreen> {
                       left: _getChevronPosition(),
                       top: 42, // Position directly connected to tooltip bottom
                       child: CustomPaint(
-                        size: const Size(32, 20), // Increased size from 24x15 to 32x20
+                        size: const Size(
+                          32,
+                          20,
+                        ), // Increased size from 24x15 to 32x20
                         painter: ChevronPainter(
                           color: ColorUtils.getFullnessColor(
                             fullnessValue.round(),
