@@ -1,10 +1,11 @@
-// StudySpaces JSON data for Cornell libraries
+// StudySpaces JSON data for Cornell libraries and leaderboard
 const String librariesJson = '''
 {
   "locations": {
     "cornell": [
       {
         "id": "olin",
+        "reservationid": 94,
         "name": "John M. Olin Library",
         "description": "Humanities and social sciences library with extensive collections and quiet study spaces.",
         "image": "assets/images/olin_library.jpg",
@@ -191,7 +192,7 @@ const String librariesJson = '''
       {"name": "d6082", "reports": 3},
       {"name": "l9375", "reports": 2},
       {"name": "p4618", "reports": 1},
-      {"name": "t1529", "reports": 1}
+      {"name": "j9999", "reports": 1}
     ],
     "week": [
       {"name": "j1843", "reports": 23},
@@ -203,7 +204,7 @@ const String librariesJson = '''
       {"name": "d6082", "reports": 8},
       {"name": "l9375", "reports": 6},
       {"name": "p4618", "reports": 4},
-      {"name": "t1529", "reports": 3}
+      {"name": "j9999", "reports": 3}
     ],
     "month": [
       {"name": "j1843", "reports": 94},
@@ -215,10 +216,10 @@ const String librariesJson = '''
       {"name": "d6082", "reports": 38},
       {"name": "l9375", "reports": 29},
       {"name": "p4618", "reports": 21},
-      {"name": "t1529", "reports": 15}
+      {"name": "j9999", "reports": 5}
     ],
     "alltime": [
-      {"name": "j1843", "reports": 987},
+      {"name": "j9999", "reports": 987},
       {"name": "m2947", "reports": 834},
       {"name": "k5729", "reports": 729},
       {"name": "a3156", "reports": 651},
@@ -229,6 +230,17 @@ const String librariesJson = '''
       {"name": "p4618", "reports": 287},
       {"name": "t1529", "reports": 194}
     ]
+  }
+}
+''';
+
+// Profile JSON data
+const String profileJson = '''
+{
+  "profile": {
+    "id": "j9999",
+    "reports": [1, 3, 5, 22],
+    "rank": [934, 432, 453, 1233]
   }
 }
 ''';

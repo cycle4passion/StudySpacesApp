@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../models/library.dart';
 import '../utils/library_utils.dart';
 
-class LibraryDetailScreen extends StatelessWidget {
+class LibraryDetailScreen extends StatefulWidget {
   final Library library;
   final VoidCallback? onHomePressed;
   final Function(int)? onTabTapped;
@@ -20,22 +20,48 @@ class LibraryDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<LibraryDetailScreen> createState() => _LibraryDetailScreenState();
+}
+
+class _LibraryDetailScreenState extends State<LibraryDetailScreen>
+    with TickerProviderStateMixin {
+  late bool isFavorite;
+  late AnimationController _modalAnimationController;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.library.isFavorite;
+    _modalAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      reverseDuration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _modalAnimationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            if (onHomePressed != null) {
+            if (widget.onHomePressed != null) {
               Navigator.of(context).pop();
-              onHomePressed!();
+              widget.onHomePressed!();
             } else {
               Navigator.of(context).pop();
             }
           },
         ),
         title: Text(
-          library.name,
+          widget.library.name,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -49,37 +75,67 @@ class LibraryDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Hero image section
-            Hero(
-              tag: 'library-image-${library.id}',
-              child: SizedBox(
-                height: 250,
-                width: double.infinity,
-                child: Image.asset(
-                  library.image,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.blue.shade300,
-                            Colors.purple.shade300,
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.local_library,
-                          size: 120,
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    );
-                  },
+            Stack(
+              children: [
+                Hero(
+                  tag: 'library-image-${widget.library.id}',
+                  child: SizedBox(
+                    height: 250,
+                    width: double.infinity,
+                    child: Image.asset(
+                      widget.library.image,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.blue.shade300,
+                                Colors.purple.shade300,
+                              ],
+                            ),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.local_library,
+                              size: 120,
+                              color: Colors.white.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Tooltip(
+                    message: isFavorite ? "Unfavorite" : "Favorite",
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isFavorite = !isFavorite;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isFavorite ? Icons.star : Icons.star_border,
+                          color: isFavorite ? Colors.yellow[600] : Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             // Content section
             Padding(
@@ -87,12 +143,7 @@ class LibraryDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    library.description,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    textAlign: TextAlign.justify,
-                  ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -102,7 +153,7 @@ class LibraryDetailScreen extends StatelessWidget {
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       // Show Reserve Space button only if library has reservationid
-                      if (library.reservationid != null)
+                      if (widget.library.reservationid != null)
                         ElevatedButton.icon(
                           onPressed: () => _showReservationModal(context),
                           icon: const Icon(Icons.event_seat, size: 18),
@@ -128,29 +179,38 @@ class LibraryDetailScreen extends StatelessWidget {
                   _buildCategoryCard(context),
                   const SizedBox(height: 12),
                   // Show "Currently Closed" if library is not open
-                  if (!LibraryUtils.isOpen(library.openat, library.closeat))
+                  if (!LibraryUtils.isOpen(
+                    widget.library.openat,
+                    widget.library.closeat,
+                  ))
                     _buildClosedCard(context),
-                  if (!LibraryUtils.isOpen(library.openat, library.closeat))
+                  if (!LibraryUtils.isOpen(
+                    widget.library.openat,
+                    widget.library.closeat,
+                  ))
                     const SizedBox(height: 12),
                   _buildDetailCard(
                     context,
                     Icons.schedule,
                     'Hours',
-                    LibraryUtils.formatHours(library.openat, library.closeat),
+                    LibraryUtils.formatHours(
+                      widget.library.openat,
+                      widget.library.closeat,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   _buildDetailCard(
                     context,
                     Icons.people,
                     'Capacity',
-                    '${library.capacity} people',
+                    '${widget.library.capacity} people',
                   ),
                   const SizedBox(height: 12),
                   _buildDetailCard(
                     context,
                     Icons.layers,
                     'Floors',
-                    '${library.floors} floors',
+                    '${widget.library.floors} floors',
                   ),
                   const SizedBox(height: 12),
                   _buildAddressCard(context),
@@ -167,7 +227,7 @@ class LibraryDetailScreen extends StatelessWidget {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: library.features.map((feature) {
+                    children: widget.library.features.map((feature) {
                       return Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -217,14 +277,14 @@ class LibraryDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: onTabTapped != null
+      bottomNavigationBar: widget.onTabTapped != null
           ? BottomNavigationBar(
-              currentIndex: currentIndex ?? 0,
+              currentIndex: widget.currentIndex ?? 0,
               onTap: (index) {
                 // Pop the current screen first
                 Navigator.of(context).pop();
                 // Then switch to the appropriate tab
-                onTabTapped!(index);
+                widget.onTabTapped!(index);
               },
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.green,
@@ -368,8 +428,8 @@ class LibraryDetailScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   LibraryUtils.getClosedStatusWithHours(
-                    library.openat,
-                    library.closeat,
+                    widget.library.openat,
+                    widget.library.closeat,
                   ),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
@@ -433,7 +493,7 @@ class LibraryDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  library.category,
+                  widget.library.category,
                   style: Theme.of(
                     context,
                   ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -452,7 +512,7 @@ class LibraryDetailScreen extends StatelessWidget {
       child: GestureDetector(
         onTap: () async {
           // Create a maps URL for cross-platform compatibility with walking directions
-          final encodedAddress = Uri.encodeComponent(library.address);
+          final encodedAddress = Uri.encodeComponent(widget.library.address);
           final mapsUrl = Uri.parse(
             'https://maps.apple.com/?daddr=$encodedAddress&dirflg=w',
           );
@@ -536,7 +596,7 @@ class LibraryDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      library.address,
+                      widget.library.address,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
@@ -562,14 +622,14 @@ class LibraryDetailScreen extends StatelessWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
-          final phoneUrl = Uri.parse('tel:${library.phone}');
+          final phoneUrl = Uri.parse('tel:${widget.library.phone}');
           if (await canLaunchUrl(phoneUrl)) {
             await launchUrl(phoneUrl);
           } else {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Could not dial ${library.phone}'),
+                  content: Text('Could not dial ${widget.library.phone}'),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -632,7 +692,7 @@ class LibraryDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      library.phone,
+                      widget.library.phone,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
@@ -655,7 +715,7 @@ class LibraryDetailScreen extends StatelessWidget {
 
   void _showReservationModal(BuildContext context) {
     final reservationUrl =
-        'https://spaces.library.cornell.edu/spaces?lid=${library.reservationid}';
+        'https://spaces.library.cornell.edu/spaces?lid=${widget.library.reservationid}';
 
     // For web platform, always use external browser due to CORS and iframe restrictions
     if (kIsWeb) {
@@ -674,19 +734,13 @@ class LibraryDetailScreen extends StatelessWidget {
         isScrollControlled: true,
         isDismissible: false,
         enableDrag: false,
-        transitionAnimationController: AnimationController(
-          duration: const Duration(milliseconds: 400), // Twice as fast slide up
-          reverseDuration: const Duration(
-            milliseconds: 300,
-          ), // Twice as fast slide down
-          vsync: Navigator.of(context),
-        ),
+        transitionAnimationController: _modalAnimationController,
         builder: (BuildContext context) {
           return SizedBox(
             height:
                 MediaQuery.of(context).size.height *
                 0.92, // 92% of screen height
-            child: _ReservationModal(library: library, url: url),
+            child: _ReservationModal(library: widget.library, url: url),
           );
         },
       );
@@ -724,6 +778,14 @@ class _ReservationModal extends StatefulWidget {
 }
 
 class _ReservationModalState extends State<_ReservationModal> {
+  WebViewController? _webViewController;
+
+  @override
+  void dispose() {
+    _webViewController = null; // Clear the reference
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -746,30 +808,30 @@ class _ReservationModalState extends State<_ReservationModal> {
 
   Widget _buildWebView(String url) {
     try {
-      late final WebViewController controller;
+      if (_webViewController == null) {
+        _webViewController = WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onProgress: (int progress) {
+                // Update loading bar if needed
+              },
+              onPageStarted: (String url) {
+                // Page started loading
+              },
+              onPageFinished: (String url) {
+                // Page finished loading
+              },
+              onWebResourceError: (WebResourceError error) {
+                // Handle errors
+                debugPrint('WebView error: ${error.description}');
+              },
+            ),
+          )
+          ..loadRequest(Uri.parse(url));
+      }
 
-      controller = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onProgress: (int progress) {
-              // Update loading bar if needed
-            },
-            onPageStarted: (String url) {
-              // Page started loading
-            },
-            onPageFinished: (String url) {
-              // Page finished loading
-            },
-            onWebResourceError: (WebResourceError error) {
-              // Handle errors
-              debugPrint('WebView error: ${error.description}');
-            },
-          ),
-        )
-        ..loadRequest(Uri.parse(url));
-
-      return WebViewWidget(controller: controller);
+      return WebViewWidget(controller: _webViewController!);
     } catch (e) {
       // Return fallback UI if webview initialization fails
       return _buildWebViewFallback(url);

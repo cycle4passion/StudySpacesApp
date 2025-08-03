@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../data/libraries_data.dart';
+import '../models/profile.dart';
 
 class LeaderboardEntry {
   final String name;
@@ -36,10 +37,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   int _previousIndex = 1; // Default to 'Week' index
+  late Profile _userProfile;
 
   @override
   void initState() {
     super.initState();
+    _loadUserProfile();
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -48,6 +51,26 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         .animate(
           CurvedAnimation(parent: _slideController, curve: Curves.easeInOut),
         );
+  }
+
+  void _loadUserProfile() {
+    final data = json.decode(profileJson);
+    _userProfile = Profile.fromJson(data['profile']);
+  }
+
+  int _getUserRankForPeriod(String period) {
+    switch (period) {
+      case 'Day':
+        return _userProfile.rank[0]; // 934
+      case 'Week':
+        return _userProfile.rank[1]; // 432
+      case 'Month':
+        return _userProfile.rank[2]; // 453
+      case 'All Time':
+        return _userProfile.rank[3]; // 1233
+      default:
+        return _userProfile.rank[1]; // Default to week
+    }
   }
 
   @override
@@ -266,26 +289,74 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                         )
                       : null,
                   boxShadow: [
+                    // Primary shadow
+                    BoxShadow(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black.withValues(alpha: 0.5)
+                          : Colors.grey.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                      spreadRadius: 2,
+                    ),
+                    // Secondary shadow for depth
                     BoxShadow(
                       color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.black.withValues(alpha: 0.3)
-                          : Colors.grey.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                          : Colors.grey.withValues(alpha: 0.15),
+                      blurRadius: 40,
+                      offset: const Offset(0, 16),
+                      spreadRadius: 4,
                     ),
                   ],
                 ),
                 child: ListView.separated(
                   padding: const EdgeInsets.all(4), // Reduced from 8
                   itemCount: currentLeaderboard.length,
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey.shade200,
-                    thickness: 1,
-                    height: 1,
-                  ),
+                  separatorBuilder: (context, index) {
+                    // Check if the next item (index + 1) is the user at position 10
+                    final nextIndex = index + 1;
+                    final isUserAtPosition10 =
+                        nextIndex < currentLeaderboard.length &&
+                        currentLeaderboard[nextIndex].name == 'j9999' &&
+                        nextIndex == 9; // Position 10 (0-based index 9)
+
+                    if (isUserAtPosition10) {
+                      // Dashed divider for user entry
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 0.5),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CustomPaint(
+                                size: const Size(double.infinity, 2),
+                                painter: DashedLinePainter(
+                                  color: Colors.green.withValues(alpha: 0.7),
+                                  dashWidth: 6,
+                                  dashSpace: 4,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // Regular divider
+                      return Divider(
+                        color: Colors.grey.shade200,
+                        thickness: 1,
+                        height: 1,
+                      );
+                    }
+                  },
                   itemBuilder: (context, index) {
                     final entry = currentLeaderboard[index];
                     final rank = index + 1;
+
+                    // Use actual user rank for j9999, otherwise use position
+                    final displayRank = entry.name == 'j9999'
+                        ? _getUserRankForPeriod(selectedPeriod)
+                        : rank;
 
                     return Container(
                       padding: const EdgeInsets.symmetric(
@@ -294,7 +365,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       decoration: BoxDecoration(
                         color: Theme.of(
                           context,
-                        ).cardColor, // Use theme-aware card color
+                        ).cardColor, // Use theme-aware card color for all entries
                         borderRadius: rank == 1
                             ? const BorderRadius.only(
                                 topLeft: Radius.circular(16),
@@ -333,7 +404,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                               ),
                               child: Center(
                                 child: Text(
-                                  '$rank',
+                                  '$displayRank',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -347,7 +418,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                               Icon(
                                 _getRankIcon(rank),
                                 color: _getRankIconColor(rank),
-                                size: 20,
+                                size: 36,
                               ),
                             ],
                           ],
@@ -462,4 +533,42 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         return Colors.green;
     }
   }
+}
+
+// Custom painter for dashed lines
+class DashedLinePainter extends CustomPainter {
+  final Color color;
+  final double dashWidth;
+  final double dashSpace;
+  final double strokeWidth;
+
+  DashedLinePainter({
+    required this.color,
+    this.dashWidth = 4.0,
+    this.dashSpace = 4.0,
+    this.strokeWidth = 1.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    double currentX = 0;
+    final y = size.height / 2;
+
+    while (currentX < size.width) {
+      canvas.drawLine(
+        Offset(currentX, y),
+        Offset(currentX + dashWidth, y),
+        paint,
+      );
+      currentX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

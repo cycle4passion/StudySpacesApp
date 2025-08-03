@@ -203,46 +203,39 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
           ),
-          // Clear filters button - always takes up space but only shows when filters are active
-          Container(
-            width: 20, // Fixed width to preserve space
-            height: 20,
-            margin: const EdgeInsets.only(right: 8.0),
-            child: filterStates.values.any((isActive) => isActive == true)
-                ? Tooltip(
-                    message: 'Clear Filters',
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(10),
-                          hoverColor: Colors.red.withValues(alpha: 0.1),
-                          onTap: () {
-                            setState(() {
-                              // Clear all filters
-                              for (String key in filterStates.keys) {
-                                filterStates[key] = false;
-                              }
-                              _applyFilters();
-                            });
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.all(
-                              2.0,
-                            ), // Much smaller padding
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.red,
-                              size: 12,
-                            ),
-                          ),
-                        ),
+          // Clear filters button - only shows when filters are active
+          if (filterStates.values.any((isActive) => isActive == true))
+            Container(
+              width: 20, // Fixed width
+              height: 20,
+              margin: const EdgeInsets.only(right: 8.0),
+              child: Tooltip(
+                message: 'Clear Filters',
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      hoverColor: Colors.red.withValues(alpha: 0.1),
+                      onTap: () {
+                        setState(() {
+                          // Clear all filters
+                          for (String key in filterStates.keys) {
+                            filterStates[key] = false;
+                          }
+                          _applyFilters();
+                        });
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(2.0), // Much smaller padding
+                        child: Icon(Icons.close, color: Colors.red, size: 12),
                       ),
                     ),
-                  )
-                : null, // Invisible but preserves space
-          ),
+                  ),
+                ),
+              ),
+            ),
           Expanded(
             child: SizedBox(
               height: 40,
@@ -570,7 +563,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   child: const Icon(
                                                     Icons.campaign,
                                                     color: Colors.white,
-                                                    size: 20,
+                                                    size: 24,
                                                   ),
                                                 ),
                                               ),
