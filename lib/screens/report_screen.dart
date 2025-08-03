@@ -103,7 +103,40 @@ class _ReportScreenState extends State<ReportScreen> {
     return tooltipLeft;
   }
 
-  // Helper method to check if any libraries are currently open
+  double _getChevronPosition() {
+    // Calculate the exact position of the chevron to align with slider thumb
+    const double sliderPadding = 24.0;
+    const double chevronWidth =
+        32.0; // Updated to match new larger chevron size
+    const double tooltipWidth = 140.0;
+    const double safeMargin = 16.0; // Increased margin to avoid curved areas
+
+    // Get screen width and calculate available slider width
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double availableWidth =
+        screenWidth - 40 - (sliderPadding * 2); // 40 is body padding
+
+    // Calculate exact thumb position based on slider value (1-5 range)
+    final double normalizedValue = (fullnessValue - 1) / 4; // Normalize to 0-1
+    final double thumbPosition =
+        sliderPadding + (normalizedValue * availableWidth);
+
+    // Get tooltip position
+    final double tooltipLeft = _getTooltipPosition();
+    final double tooltipRight = tooltipLeft + tooltipWidth;
+
+    // Center chevron on thumb position
+    double chevronLeft = thumbPosition - (chevronWidth / 2);
+
+    // Ensure chevron stays well within tooltip bounds (avoid rounded corners)
+    final double minChevronLeft = tooltipLeft + safeMargin;
+    final double maxChevronLeft = tooltipRight - safeMargin - chevronWidth;
+
+    chevronLeft = chevronLeft.clamp(minChevronLeft, maxChevronLeft);
+
+    return chevronLeft;
+  } // Helper method to check if any libraries are currently open
+
   bool get hasOpenLibraries {
     return libraries.any(
       (library) => LibraryUtils.isOpen(library.openat, library.closeat),
@@ -247,7 +280,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
               // Custom slider with following tooltip
               SizedBox(
-                height: 90, // Increased height to accommodate more space
+                height: 100, // Increased height to accommodate chevron
                 child: Stack(
                   clipBehavior:
                       Clip.none, // Allow tooltip to show outside bounds
@@ -288,9 +321,22 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
                     ),
+                    // Chevron pointing to slider thumb
+                    Positioned(
+                      left: _getChevronPosition(),
+                      top: 42, // Position directly connected to tooltip bottom
+                      child: CustomPaint(
+                        size: const Size(32, 20), // Increased size from 24x15 to 32x20
+                        painter: ChevronPainter(
+                          color: ColorUtils.getFullnessColor(
+                            fullnessValue.round(),
+                          ),
+                        ),
+                      ),
+                    ),
                     // Slider positioned below tooltip with more space
                     Positioned(
-                      top: 60,
+                      top: 70, // Moved down to accommodate chevron
                       left: 0,
                       right: 0,
                       child: SliderTheme(
@@ -345,58 +391,152 @@ class _ReportScreenState extends State<ReportScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).colorScheme.secondary,
-                        foregroundColor: Theme.of(
-                          context,
-                        ).colorScheme.onSecondary,
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        minimumSize: const Size(0, 56),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          // Primary shadow for depth
+                          BoxShadow(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.secondary.withValues(alpha: 0.4),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                            spreadRadius: 1,
+                          ),
+                          // Secondary shadow for more depth
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                            spreadRadius: 0,
+                          ),
+                          // Highlight shadow for 3D effect
+                          BoxShadow(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, -2),
+                            spreadRadius: 0,
+                          ),
+                        ],
                       ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.secondary,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onSecondary,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          minimumSize: const Size(0, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation:
+                              0, // Remove default elevation to use custom shadows
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                offset: const Offset(1, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: selectedLibrary != null
-                          ? _showSubmitDialog
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: selectedLibrary != null
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
-                        foregroundColor: selectedLibrary != null
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.38),
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        minimumSize: const Size(0, 56),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: selectedLibrary != null
+                            ? [
+                                // Primary shadow for depth
+                                BoxShadow(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                  spreadRadius: 1,
+                                ),
+                                // Secondary shadow for more depth
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                  spreadRadius: 0,
+                                ),
+                                // Highlight shadow for 3D effect
+                                BoxShadow(
+                                  color: Colors.white.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, -2),
+                                  spreadRadius: 0,
+                                ),
+                              ]
+                            : [
+                                // Disabled state shadow
+                                BoxShadow(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outline.withValues(alpha: 0.2),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                  spreadRadius: 0,
+                                ),
+                              ],
                       ),
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                      child: ElevatedButton(
+                        onPressed: selectedLibrary != null
+                            ? _showSubmitDialog
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: selectedLibrary != null
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.outline,
+                          foregroundColor: selectedLibrary != null
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.38),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          minimumSize: const Size(0, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation:
+                              0, // Remove default elevation to use custom shadows
+                        ),
+                        child: Text(
+                          'Submit',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            shadows: selectedLibrary != null
+                                ? [
+                                    Shadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                      offset: const Offset(1, 1),
+                                      blurRadius: 2,
+                                    ),
+                                  ]
+                                : null,
+                          ),
                         ),
                       ),
                     ),
@@ -410,4 +550,30 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
     );
   }
+}
+
+// Custom painter for the downward pointing chevron
+class ChevronPainter extends CustomPainter {
+  final Color color;
+
+  ChevronPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    // Create a downward pointing chevron/triangle
+    path.moveTo(size.width * 0.5, size.height); // Bottom center point
+    path.lineTo(0, 0); // Top left
+    path.lineTo(size.width, 0); // Top right
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(ChevronPainter oldDelegate) => oldDelegate.color != color;
 }
