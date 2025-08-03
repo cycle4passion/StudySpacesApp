@@ -363,9 +363,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                         vertical: 2,
                       ), // Reduced from 4
                       decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).cardColor, // Use theme-aware card color for all entries
+                        color: index % 2 == 0
+                            ? Colors.green.withValues(
+                                alpha: 0.05,
+                              ) // Light green for even indices
+                            : Colors.white, // White for odd indices
                         borderRadius: rank == 1
                             ? const BorderRadius.only(
                                 topLeft: Radius.circular(16),

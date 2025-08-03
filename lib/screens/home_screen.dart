@@ -67,6 +67,28 @@ class _HomeScreenState extends State<HomeScreen> {
     'Silent': Color(0xFFEDE5FF), // Pastel Violet
   };
 
+  // Corresponding full opacity border colors for filters
+  Map<String, Color> filterBorderColors = {
+    '24/7': Color(
+      0xFFFF0000,
+    ).withValues(alpha: 0.5), // Full Red with 50% opacity
+    'Open 2+ hrs': Color(
+      0xFFFF8000,
+    ).withValues(alpha: 0.5), // Full Orange with 50% opacity
+    'Reservations': Color(
+      0xFFFFD700,
+    ).withValues(alpha: 0.5), // Full Yellow/Gold with 50% opacity
+    'Printers': Color(
+      0xFF00C000,
+    ).withValues(alpha: 0.5), // Full Green with 50% opacity
+    'Staffed': Color(
+      0xFF0080FF,
+    ).withValues(alpha: 0.5), // Full Blue with 50% opacity
+    'Silent': Color(
+      0xFF8000FF,
+    ).withValues(alpha: 0.5), // Full Violet with 50% opacity
+  };
+
   @override
   void initState() {
     super.initState();
@@ -273,6 +295,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         checkmarkColor: Colors.black87,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
+                          side: BorderSide(
+                            color: filterStates[filterName] == true
+                                ? filterBorderColors[filterName] ??
+                                      Colors.black54
+                                : (filterBorderColors[filterName] ??
+                                          Colors.grey.shade400)
+                                      .withValues(alpha: 0.3),
+                            width: filterStates[filterName] == true ? 2.0 : 1.0,
+                          ),
                         ),
                       ),
                     );
@@ -554,11 +585,62 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     8,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.green,
+                                                    gradient: LinearGradient(
+                                                      begin: Alignment.topLeft,
+                                                      end:
+                                                          Alignment.bottomRight,
+                                                      colors: [
+                                                        Colors.green.shade400,
+                                                        Colors.green.shade600,
+                                                      ],
+                                                    ),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           16,
                                                         ),
+                                                    boxShadow: [
+                                                      // Primary shadow for depth
+                                                      BoxShadow(
+                                                        color: Colors
+                                                            .green
+                                                            .shade800
+                                                            .withValues(
+                                                              alpha: 0.4,
+                                                            ),
+                                                        blurRadius: 8,
+                                                        offset: const Offset(
+                                                          0,
+                                                          4,
+                                                        ),
+                                                        spreadRadius: 0,
+                                                      ),
+                                                      // Secondary shadow for more depth
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withValues(
+                                                              alpha: 0.2,
+                                                            ),
+                                                        blurRadius: 12,
+                                                        offset: const Offset(
+                                                          0,
+                                                          6,
+                                                        ),
+                                                        spreadRadius: 1,
+                                                      ),
+                                                      // Inner highlight for 3D effect
+                                                      BoxShadow(
+                                                        color: Colors.white
+                                                            .withValues(
+                                                              alpha: 0.3,
+                                                            ),
+                                                        blurRadius: 4,
+                                                        offset: const Offset(
+                                                          0,
+                                                          -1,
+                                                        ),
+                                                        spreadRadius: 0,
+                                                      ),
+                                                    ],
                                                   ),
                                                   child: const Icon(
                                                     Icons.campaign,

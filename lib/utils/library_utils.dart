@@ -323,16 +323,7 @@ class LibraryUtils {
       int openMinute = openTime % 100;
 
       DateTime openDateTime;
-      if (currentTime < openTime) {
-        // Same day opening (current time is before opening time today)
-        openDateTime = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          openHour,
-          openMinute,
-        );
-      } else if (currentTime > closeTime && closeTime < openTime) {
+      if (currentTime > closeTime && closeTime < openTime) {
         // Same day opening (we're between close and open time for overnight schedule)
         openDateTime = DateTime(
           now.year,
