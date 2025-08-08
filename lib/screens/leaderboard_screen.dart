@@ -181,7 +181,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     final selectedIndex = periods.indexOf(selectedPeriod);
 
                     return SizedBox(
-                      height: 44, // Reduced from 52
+                      height: 40, // Reduced from 44
                       child: Stack(
                         children: [
                           // Animated background pill
@@ -232,7 +232,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                 child: SizedBox(
                                   width:
                                       itemWidth, // Fixed width for each button
-                                  height: 44, // Reduced from 52
+                                  height: 40, // Reduced from 44
                                   child: MouseRegion(
                                     cursor: SystemMouseCursors.click,
                                     child: Center(
@@ -279,7 +279,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   12, // Reduced from 16
                   2, // Reduced from 6 to decrease space from selector
                   12, // Reduced from 16
-                  16,
+                  8, // Further reduced bottom margin from 16
                 ),
                 child: Card(
                   elevation: 4,
@@ -300,7 +300,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     child: ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(4), // Reduced from 8
+                      padding: const EdgeInsets.all(
+                        2,
+                      ), // Further reduced from 4
                       itemCount: currentLeaderboard.length,
                       separatorBuilder: (context, index) {
                         // Check if the next item (index + 1) is the user at position 10
@@ -352,8 +354,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
                         return Container(
                           padding: const EdgeInsets.symmetric(
-                            vertical: 0.2,
-                          ), // Reduced from 0.4
+                            vertical: 0.1,
+                          ), // Further reduced from 0.2
                           decoration: BoxDecoration(
                             color: index % 2 == 0
                                 ? Colors.green.withValues(
@@ -374,15 +376,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                           ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 6, // Reduced from 8
+                              horizontal: 4, // Further reduced from 6
                               vertical: 0, // Keep at 0
                             ),
                             leading: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Container(
-                                  width: 32, // Increased from 24
-                                  height: 32, // Increased from 24
+                                  width: 28, // Reduced from 32
+                                  height: 28, // Reduced from 32
                                   decoration: BoxDecoration(
                                     color: _getRankBadgeColor(rank),
                                     shape: BoxShape.circle,
@@ -403,7 +405,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize:
-                                            11, // Increased from 9 to fit larger circle
+                                            10, // Reduced from 11 to fit smaller circle
                                       ),
                                     ),
                                   ),
@@ -413,7 +415,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                   Icon(
                                     _getRankIcon(rank),
                                     color: _getRankIconColor(rank),
-                                    size: 32, // Increased from 26
+                                    size: 28, // Reduced from 32
                                   ),
                                 ],
                               ],
@@ -422,7 +424,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                               entry.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16, // Increased from 14
+                                fontSize: 15, // Reduced from 16
                                 color: Colors
                                     .grey
                                     .shade800, // Consistent text color
@@ -430,8 +432,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                             ),
                             trailing: Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12, // Increased from 8
-                                vertical: 6, // Increased from 4
+                                horizontal: 10, // Reduced from 12
+                                vertical: 4, // Reduced from 6
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.green.withValues(
@@ -443,7 +445,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                 '${entry.reports} ${entry.reports == 1 ? 'Report' : 'Reports'}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14, // Increased from 12
+                                  fontSize: 13, // Reduced from 14
                                   color: Colors.green, // Consistent text color
                                 ),
                               ),
