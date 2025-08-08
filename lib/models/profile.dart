@@ -57,7 +57,7 @@ class Profile {
     return favorites.contains(spaceId);
   }
 
-  List<String> get favoriteSpaces => List.from(favorites);
+  List<String> get favoriteSpaces => favorites;
 
   // Helper methods for time period specific data
   int get dailyReports => reports.isNotEmpty ? reports[0] : 0;

@@ -131,9 +131,10 @@ class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
           const end = Offset.zero;
           const curve = Curves.easeInOut;
 
-          var tween = Tween(begin: begin, end: end).chain(
-            CurveTween(curve: curve),
-          );
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
 
           return SlideTransition(
             position: animation.drive(tween),
@@ -282,9 +283,9 @@ class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildCategoryCard(context),
-                  const SizedBox(height: 12),
                   _buildEnhancedHoursCard(context),
+                  const SizedBox(height: 12),
+                  _buildCategoryCard(context),
                   const SizedBox(height: 12),
                   _buildDetailCard(
                     context,

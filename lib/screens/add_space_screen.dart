@@ -180,7 +180,7 @@ class _AddSpaceScreenState extends State<AddSpaceScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Thank you for suggesting a new Space',
+                              'Thank you for suggesting a new Space!',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,

@@ -630,6 +630,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           !(favoriteStates[space
                                                                   .id] ??
                                                               false);
+                                                      // Update profile data to persist changes
+                                                      ProfileUtils.updateFavoriteSpace(
+                                                        space.id,
+                                                        favoriteStates[space
+                                                                .id] ??
+                                                            false,
+                                                      );
+                                                      // Re-apply sorting to update order
+                                                      _sortSpaces();
                                                     });
                                                   },
                                                   child: Container(

@@ -3,10 +3,17 @@ import '../data/spaces_data.dart';
 import '../models/profile.dart';
 
 class ProfileUtils {
+  // In-memory profile data that can be modified
+  static Profile? _cachedProfile;
+
   /// Load profile data from JSON
   static Profile loadProfile() {
+    if (_cachedProfile != null) {
+      return _cachedProfile!;
+    }
     final data = json.decode(profileJson);
-    return Profile.fromJson(data['profile']);
+    _cachedProfile = Profile.fromJson(data['profile']);
+    return _cachedProfile!;
   }
 
   /// Get profile statistics
@@ -72,6 +79,16 @@ class ProfileUtils {
   static bool isSpaceFavorite(String spaceId) {
     final profile = loadProfile();
     return profile.isFavorite(spaceId);
+  }
+
+  /// Update favorite space status
+  static void updateFavoriteSpace(String spaceId, bool isFavorite) {
+    final profile = loadProfile();
+    if (isFavorite && !profile.favoriteSpaces.contains(spaceId)) {
+      profile.favoriteSpaces.add(spaceId);
+    } else if (!isFavorite && profile.favoriteSpaces.contains(spaceId)) {
+      profile.favoriteSpaces.remove(spaceId);
+    }
   }
 
   /// Get time period specific data
