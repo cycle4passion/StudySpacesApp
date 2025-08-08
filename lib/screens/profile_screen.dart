@@ -336,26 +336,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: widget.onHomePressed,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(color: Colors.green.shade700, width: 2.0),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Image.asset(
-                  'assets/icon/icon.png',
-                  width: 32,
-                  height: 32,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: widget.onHomePressed,
         ),
         title: const Text(
           'Profile',
