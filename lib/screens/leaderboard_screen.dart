@@ -154,12 +154,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           // Segmented Control
           Container(
             margin: const EdgeInsets.fromLTRB(
-              8, // Reduced from 12
-              8, // Reduced from 12
-              8, // Reduced from 12
-              4, // Reduced from 6
+              12, // Increased from 8 for better balance
+              6, // Reduced from 8
+              12, // Increased from 8 for better balance
+              3, // Reduced from 4
             ),
-            padding: const EdgeInsets.all(4), // Reduced from 6
+            padding: const EdgeInsets.all(3), // Reduced from 4
             decoration: BoxDecoration(
               color: Colors.green.withValues(
                 alpha: 0.1,
@@ -184,7 +184,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 final selectedIndex = periods.indexOf(selectedPeriod);
 
                 return SizedBox(
-                  height: 52, // Increased from 44 for larger touch targets
+                  height: 44, // Reduced from 52
                   child: Stack(
                     children: [
                       // Animated background pill
@@ -192,11 +192,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                         left:
-                            selectedIndex * itemWidth + 4, // Add padding offset
-                        top: 4,
-                        bottom: 4,
-                        width:
-                            itemWidth - 8, // Account for padding on both sides
+                            selectedIndex * itemWidth +
+                            3, // Reduced padding offset
+                        top: 3, // Reduced from 4
+                        bottom: 3, // Reduced from 4
+                        width: itemWidth - 6, // Reduced from 8
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.green,
@@ -233,8 +233,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                             },
                             child: SizedBox(
                               width: itemWidth, // Fixed width for each button
-                              height:
-                                  52, // Increased from 44 for larger touch targets
+                              height: 44, // Reduced from 52
                               child: MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: Center(
@@ -247,7 +246,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                       fontWeight: isSelected
                                           ? FontWeight.w700
                                           : FontWeight.w500,
-                                      fontSize: 13,
+                                      fontSize: 14, // Increased from 12
                                       letterSpacing: 0.3,
                                     ),
                                     child: Text(
@@ -360,8 +359,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                        vertical: 2,
-                      ), // Reduced from 4
+                        vertical: 0.2,
+                      ), // Reduced from 0.4
                       decoration: BoxDecoration(
                         color: index % 2 == 0
                             ? Colors.green.withValues(
@@ -382,15 +381,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 1, // Reduced from 2
-                          vertical: 0, // Reduced from 2
+                          horizontal: 6, // Reduced from 8
+                          vertical: 0, // Keep at 0
                         ),
                         leading: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              width: 32, // Reduced from 36
-                              height: 32, // Reduced from 36
+                              width: 32, // Increased from 24
+                              height: 32, // Increased from 24
                               decoration: BoxDecoration(
                                 color: _getRankBadgeColor(rank),
                                 shape: BoxShape.circle,
@@ -410,17 +409,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 10, // Smaller to fit #1, #2, etc.
+                                    fontSize:
+                                        11, // Increased from 9 to fit larger circle
                                   ),
                                 ),
                               ),
                             ),
                             if (rank <= 3) ...[
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 4), // Keep spacing same
                               Icon(
                                 _getRankIcon(rank),
                                 color: _getRankIconColor(rank),
-                                size: 36,
+                                size: 32, // Increased from 26
                               ),
                             ],
                           ],
@@ -429,15 +429,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                           entry.name,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 15, // Reduced from 16
+                            fontSize: 16, // Increased from 14
                             color:
                                 Colors.grey.shade800, // Consistent text color
                           ),
                         ),
                         trailing: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8, // Reduced from 10
-                            vertical: 3, // Reduced from 4
+                            horizontal: 12, // Increased from 8
+                            vertical: 6, // Increased from 4
                           ),
                           decoration: BoxDecoration(
                             color: Colors.green.withValues(
@@ -449,7 +449,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                             '${entry.reports} ${entry.reports == 1 ? 'Report' : 'Reports'}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 13, // Reduced from 14
+                              fontSize: 14, // Increased from 12
                               color: Colors.green, // Consistent text color
                             ),
                           ),

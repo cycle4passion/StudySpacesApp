@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _refreshSpaces() async {
     // Add a small delay to simulate network request
     await Future.delayed(const Duration(milliseconds: 1000));
-    
+
     // Reload the spaces data
     _loadSpaces();
   }
@@ -405,9 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'Try adjusting your filters to see more results.',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
+                                    style: Theme.of(context).textTheme.bodyLarge
                                         ?.copyWith(color: Colors.grey.shade500),
                                     textAlign: TextAlign.center,
                                   ),
@@ -421,330 +419,380 @@ class _HomeScreenState extends State<HomeScreen> {
                   : ListView.builder(
                       padding: EdgeInsets
                           .zero, // Remove top padding to be flush with app bar
-                      itemCount: filteredSpaces.length +
+                      itemCount:
+                          filteredSpaces.length +
                           1, // +1 for the filter accordion
                       itemBuilder: (context, index) {
-                // First item is the filter row
-                if (index == 0) {
-                  return _buildFilterRow();
-                }
+                        // First item is the filter row
+                        if (index == 0) {
+                          return _buildFilterRow();
+                        }
 
-                // Adjust index for space items
-                final spaceIndex = index - 1;
-                final space = filteredSpaces[spaceIndex];
-                final bool isSpaceOpen = SpacesUtils.isOpen(
-                  space.openat,
-                  space.closeat,
-                );
+                        // Adjust index for space items
+                        final spaceIndex = index - 1;
+                        final space = filteredSpaces[spaceIndex];
+                        final bool isSpaceOpen = SpacesUtils.isOpen(
+                          space.openat,
+                          space.closeat,
+                        );
 
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    16.0,
-                    0,
-                    16.0,
-                    16.0,
-                  ), // No top padding for first space item
-                  child: Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Stack(
-                      children: [
-                        InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SpacesDetailScreen(
-                                  space: space,
-                                  onHomePressed: widget.onHomePressed,
-                                  onTabTapped: widget.onTabTapped,
-                                  currentIndex: widget.currentIndex,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Opacity(
-                            opacity: isSpaceOpen ? 1.0 : 0.3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            16.0,
+                            0,
+                            16.0,
+                            16.0,
+                          ), // No top padding for first space item
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Stack(
                               children: [
-                                Stack(
-                                  children: [
-                                    Hero(
-                                      tag: 'space-image-${space.id}',
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                              top: Radius.circular(16),
+                                InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            SpacesDetailScreen(
+                                              space: space,
+                                              onHomePressed:
+                                                  widget.onHomePressed,
+                                              onTabTapped: widget.onTabTapped,
+                                              currentIndex: widget.currentIndex,
                                             ),
-                                        child: SizedBox(
-                                          height: 133,
-                                          width: double.infinity,
-                                          child: Image.asset(
-                                            space.image,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Container(
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        begin:
-                                                            Alignment.topLeft,
-                                                        end: Alignment
-                                                            .bottomRight,
-                                                        colors: [
-                                                          Colors.blue.shade300,
-                                                          Colors
-                                                              .purple
-                                                              .shade300,
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.local_library,
-                                                      size: 80,
-                                                      color: Colors.white
-                                                          .withValues(
-                                                            alpha: 0.8,
-                                                          ),
-                                                    ),
-                                                  );
-                                                },
-                                          ),
-                                        ),
                                       ),
-                                    ),
-                                    Positioned(
-                                      top: 8,
-                                      right: 8,
-                                      child: Tooltip(
-                                        message:
-                                            (favoriteStates[space.id] ?? false)
-                                            ? "Unfavorite"
-                                            : "Favorite",
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              favoriteStates[space.id] =
-                                                  !(favoriteStates[space.id] ??
-                                                      false);
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.3,
-                                              ),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Icon(
-                                              (favoriteStates[space.id] ??
-                                                      false)
-                                                  ? Icons.star
-                                                  : Icons.star_border,
-                                              color:
-                                                  (favoriteStates[space.id] ??
-                                                      false)
-                                                  ? Colors.yellow[600]
-                                                  : Colors.white,
-                                              size: 24,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // First row: Space name and report button
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              space.name,
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20,
-                                                    color: Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface,
-                                                  ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          if (isSpaceOpen)
-                                            Tooltip(
-                                              message:
-                                                  'Report capacity for ${space.name}',
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  widget.onReportPressed?.call(
-                                                    space,
-                                                  );
-                                                },
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(
-                                                    8,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      begin: Alignment.topLeft,
-                                                      end:
-                                                          Alignment.bottomRight,
-                                                      colors: [
-                                                        Colors.green.shade400,
-                                                        Colors.green.shade600,
-                                                      ],
+                                    );
+                                  },
+                                  child: Opacity(
+                                    opacity: isSpaceOpen ? 1.0 : 0.3,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Stack(
+                                          children: [
+                                            Hero(
+                                              tag: 'space-image-${space.id}',
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    const BorderRadius.vertical(
+                                                      top: Radius.circular(16),
                                                     ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          16,
-                                                        ),
-                                                    boxShadow: [
-                                                      // Primary shadow for depth
-                                                      BoxShadow(
-                                                        color: Colors
-                                                            .green
-                                                            .shade800
-                                                            .withValues(
-                                                              alpha: 0.4,
+                                                child: SizedBox(
+                                                  height: 133,
+                                                  width: double.infinity,
+                                                  child: Image.asset(
+                                                    space.image,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return Container(
+                                                            decoration: BoxDecoration(
+                                                              gradient: LinearGradient(
+                                                                begin: Alignment
+                                                                    .topLeft,
+                                                                end: Alignment
+                                                                    .bottomRight,
+                                                                colors: [
+                                                                  Colors
+                                                                      .blue
+                                                                      .shade300,
+                                                                  Colors
+                                                                      .purple
+                                                                      .shade300,
+                                                                ],
+                                                              ),
                                                             ),
-                                                        blurRadius: 8,
-                                                        offset: const Offset(
-                                                          0,
-                                                          4,
-                                                        ),
-                                                        spreadRadius: 0,
-                                                      ),
-                                                      // Secondary shadow for more depth
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withValues(
-                                                              alpha: 0.2,
+                                                            child: Icon(
+                                                              Icons
+                                                                  .local_library,
+                                                              size: 80,
+                                                              color: Colors
+                                                                  .white
+                                                                  .withValues(
+                                                                    alpha: 0.8,
+                                                                  ),
                                                             ),
-                                                        blurRadius: 12,
-                                                        offset: const Offset(
-                                                          0,
-                                                          6,
-                                                        ),
-                                                        spreadRadius: 1,
-                                                      ),
-                                                      // Inner highlight for 3D effect
-                                                      BoxShadow(
-                                                        color: Colors.white
-                                                            .withValues(
-                                                              alpha: 0.3,
-                                                            ),
-                                                        blurRadius: 4,
-                                                        offset: const Offset(
-                                                          0,
-                                                          -1,
-                                                        ),
-                                                        spreadRadius: 0,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.campaign,
-                                                    color: Colors.white,
-                                                    size: 24,
+                                                          );
+                                                        },
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          // Left side - Fullness indicator (only if space is open)
-                                          if (isSpaceOpen)
-                                            Flexible(
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Container(
-                                                    width: 12,
-                                                    height: 12,
+                                            Positioned(
+                                              top: 8,
+                                              right: 8,
+                                              child: Tooltip(
+                                                message:
+                                                    (favoriteStates[space.id] ??
+                                                        false)
+                                                    ? "Unfavorite"
+                                                    : "Favorite",
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      favoriteStates[space.id] =
+                                                          !(favoriteStates[space
+                                                                  .id] ??
+                                                              false);
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
                                                     decoration: BoxDecoration(
-                                                      color:
-                                                          ColorUtils.getFullnessColor(
-                                                            space.fullness,
+                                                      color: Colors.black
+                                                          .withValues(
+                                                            alpha: 0.3,
                                                           ),
                                                       shape: BoxShape.circle,
                                                     ),
+                                                    child: Icon(
+                                                      (favoriteStates[space
+                                                                  .id] ??
+                                                              false)
+                                                          ? Icons.star
+                                                          : Icons.star_border,
+                                                      color:
+                                                          (favoriteStates[space
+                                                                  .id] ??
+                                                              false)
+                                                          ? Colors.yellow[600]
+                                                          : Colors.white,
+                                                      size: 24,
+                                                    ),
                                                   ),
-                                                  const SizedBox(width: 6),
-                                                  Flexible(
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // First row: Space name and report button
+                                              Row(
+                                                children: [
+                                                  Expanded(
                                                     child: Text(
-                                                      SpacesUtils.getFullnessText(
-                                                        space.fullness,
-                                                      ),
+                                                      space.name,
                                                       overflow:
                                                           TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSurface
-                                                            .withValues(
-                                                              alpha: 0.8,
+                                                      maxLines: 1,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium
+                                                          ?.copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 20,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSurface,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  if (isSpaceOpen)
+                                                    Tooltip(
+                                                      message:
+                                                          'Report capacity for ${space.name}',
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          widget.onReportPressed
+                                                              ?.call(space);
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets.all(
+                                                                8,
+                                                              ),
+                                                          decoration: BoxDecoration(
+                                                            gradient: LinearGradient(
+                                                              begin: Alignment
+                                                                  .topLeft,
+                                                              end: Alignment
+                                                                  .bottomRight,
+                                                              colors: [
+                                                                Colors
+                                                                    .green
+                                                                    .shade400,
+                                                                Colors
+                                                                    .green
+                                                                    .shade600,
+                                                              ],
                                                             ),
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  16,
+                                                                ),
+                                                            boxShadow: [
+                                                              // Primary shadow for depth
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .green
+                                                                    .shade800
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.4,
+                                                                    ),
+                                                                blurRadius: 8,
+                                                                offset:
+                                                                    const Offset(
+                                                                      0,
+                                                                      4,
+                                                                    ),
+                                                                spreadRadius: 0,
+                                                              ),
+                                                              // Secondary shadow for more depth
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.2,
+                                                                    ),
+                                                                blurRadius: 12,
+                                                                offset:
+                                                                    const Offset(
+                                                                      0,
+                                                                      6,
+                                                                    ),
+                                                                spreadRadius: 1,
+                                                              ),
+                                                              // Inner highlight for 3D effect
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .white
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.3,
+                                                                    ),
+                                                                blurRadius: 4,
+                                                                offset:
+                                                                    const Offset(
+                                                                      0,
+                                                                      -1,
+                                                                    ),
+                                                                spreadRadius: 0,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: const Icon(
+                                                            Icons.campaign,
+                                                            color: Colors.white,
+                                                            size: 24,
+                                                          ),
+                                                        ),
                                                       ),
+                                                    ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  // Left side - Fullness indicator (only if space is open)
+                                                  if (isSpaceOpen)
+                                                    Flexible(
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Container(
+                                                            width: 12,
+                                                            height: 12,
+                                                            decoration: BoxDecoration(
+                                                              color:
+                                                                  ColorUtils.getFullnessColor(
+                                                                    space
+                                                                        .fullness,
+                                                                  ),
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 6,
+                                                          ),
+                                                          Flexible(
+                                                            child: Text(
+                                                              SpacesUtils.getFullnessText(
+                                                                space.fullness,
+                                                              ),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .onSurface
+                                                                        .withValues(
+                                                                          alpha:
+                                                                              0.8,
+                                                                        ),
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  // If space is closed, use a spacer to push content right
+                                                  if (!isSpaceOpen)
+                                                    const Spacer(),
+                                                  // Right side - Time status
+                                                  Text(
+                                                    SpacesUtils.getTimeStatusText(
+                                                      space.openat,
+                                                      space.closeat,
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: isSpaceOpen
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14,
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                          // If space is closed, use a spacer to push content right
-                                          if (!isSpaceOpen) const Spacer(),
-                                          // Right side - Time status
-                                          Text(
-                                            SpacesUtils.getTimeStatusText(
-                                              space.openat,
-                                              space.closeat,
-                                            ),
-                                            style: TextStyle(
-                                              color: isSpaceOpen
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
-                );
-              },
-            ),
             ),
     );
   }
