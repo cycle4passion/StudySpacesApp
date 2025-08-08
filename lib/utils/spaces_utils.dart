@@ -20,7 +20,7 @@ class GeofenceResult {
 
 class SpacesUtils {
   /// Developer flag to bypass geofence for testing
-  static bool fakeLocation = false;
+  static bool fakeLocation = true;
 
   /// Result type for geofence checking with specific error information
   static Future<GeofenceResult> geofenceWithDetails({

@@ -93,6 +93,30 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _refreshSpaces() async {
+    // Add a small delay to simulate network request
+    await Future.delayed(const Duration(milliseconds: 1000));
+    
+    // Reload the spaces data
+    _loadSpaces();
+    
+    // Show a brief feedback message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Study spaces refreshed'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    }
+  }
+
   void _sortSpaces() {
     filteredSpaces.sort((a, b) {
       final aFav = favoriteStates[a.id] ?? false;
@@ -362,51 +386,60 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: spaces.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : filteredSpaces.isEmpty
-          ? Column(
-              children: [
-                _buildFilterRow(),
-                Expanded(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 80,
-                            color: Colors.grey.shade400,
+          : RefreshIndicator(
+              onRefresh: _refreshSpaces,
+              color: Colors.green,
+              backgroundColor: Colors.white,
+              child: filteredSpaces.isEmpty
+                  ? CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(child: _buildFilterRow()),
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.search_off,
+                                    size: 80,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'No Spaces Found',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                          color: Colors.grey.shade600,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Try adjusting your filters to see more results.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(color: Colors.grey.shade500),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No Spaces Found',
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(
-                                  color: Colors.grey.shade600,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Try adjusting your filters to see more results.',
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(color: Colors.grey.shade500),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : ListView.builder(
-              padding: EdgeInsets
-                  .zero, // Remove top padding to be flush with app bar
-              itemCount:
-                  filteredSpaces.length + 1, // +1 for the filter accordion
-              itemBuilder: (context, index) {
+                        ),
+                      ],
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets
+                          .zero, // Remove top padding to be flush with app bar
+                      itemCount: filteredSpaces.length +
+                          1, // +1 for the filter accordion
+                      itemBuilder: (context, index) {
                 // First item is the filter row
                 if (index == 0) {
                   return _buildFilterRow();
@@ -727,6 +760,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               },
+            ),
             ),
     );
   }

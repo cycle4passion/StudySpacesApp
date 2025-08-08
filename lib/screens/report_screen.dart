@@ -708,6 +708,38 @@ class _ReportScreenState extends State<ReportScreen> {
                   // Location restriction message with different styling based on error type
                   _buildLocationErrorWidget(),
                   const SizedBox(height: 20),
+                ] else if (SpacesUtils.fakeLocation &&
+                    canReportAtCurrentLocation) ...[
+                  // Show developer mode indicator when location check is bypassed
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.developer_mode,
+                          color: Colors.blue.shade700,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'Developer Mode: Location check bypassed - you can report from anywhere',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ],
 
@@ -847,16 +879,16 @@ class _ReportScreenState extends State<ReportScreen> {
                           boxShadow: [
                             // Primary shadow for depth
                             BoxShadow(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.secondary.withValues(alpha: 0.4),
+                              color: Colors.grey.shade400.withValues(
+                                alpha: 0.4,
+                              ),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                               spreadRadius: 1,
                             ),
                             // Secondary shadow for more depth
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                               spreadRadius: 0,
@@ -875,12 +907,8 @@ class _ReportScreenState extends State<ReportScreen> {
                             Navigator.of(context).pop();
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.secondary,
-                            foregroundColor: Theme.of(
-                              context,
-                            ).colorScheme.onSecondary,
+                            backgroundColor: Colors.grey.shade400,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 20),
                             minimumSize: const Size(0, 56),
                             shape: RoundedRectangleBorder(
@@ -896,7 +924,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               fontWeight: FontWeight.w600,
                               shadows: [
                                 Shadow(
-                                  color: Colors.black.withValues(alpha: 0.3),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   offset: const Offset(1, 1),
                                   blurRadius: 2,
                                 ),
@@ -918,8 +946,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ? [
                                   // Primary shadow for depth
                                   BoxShadow(
-                                    color: Theme.of(context).colorScheme.primary
-                                        .withValues(alpha: 0.4),
+                                    color: Colors.green.withValues(alpha: 0.4),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                     spreadRadius: 1,
@@ -942,8 +969,9 @@ class _ReportScreenState extends State<ReportScreen> {
                               : [
                                   // Disabled state shadow
                                   BoxShadow(
-                                    color: Theme.of(context).colorScheme.outline
-                                        .withValues(alpha: 0.2),
+                                    color: Colors.grey.shade300.withValues(
+                                      alpha: 0.3,
+                                    ),
                                     blurRadius: 4,
                                     offset: const Offset(0, 2),
                                     spreadRadius: 0,
@@ -962,15 +990,14 @@ class _ReportScreenState extends State<ReportScreen> {
                                 selectedSpace != null &&
                                     canReportAtCurrentLocation &&
                                     !isCheckingLocation
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.outline,
+                                ? Colors.green
+                                : Colors.grey.shade300,
                             foregroundColor:
                                 selectedSpace != null &&
                                     canReportAtCurrentLocation &&
                                     !isCheckingLocation
-                                ? Theme.of(context).colorScheme.onPrimary
-                                : Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.38),
+                                ? Colors.white
+                                : Colors.grey.shade600,
                             padding: const EdgeInsets.symmetric(vertical: 20),
                             minimumSize: const Size(0, 56),
                             shape: RoundedRectangleBorder(
