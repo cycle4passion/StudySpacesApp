@@ -1,4 +1,4 @@
-class Library {
+class Space {
   final String id;
   final int? reservationid; // Optional reservation ID
   final String name;
@@ -18,7 +18,7 @@ class Library {
   final bool isFavorite;
   final String phone;
 
-  Library({
+  Space({
     required this.id,
     this.reservationid, // Optional parameter
     required this.name,
@@ -39,8 +39,8 @@ class Library {
     required this.phone,
   });
 
-  factory Library.fromJson(Map<String, dynamic> json) {
-    return Library(
+  factory Space.fromJson(Map<String, dynamic> json) {
+    return Space(
       id: json['id'],
       reservationid: json['reservationid'], // Will be null if not present
       name: json['name'],

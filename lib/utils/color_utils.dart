@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorUtils {
-  /// Returns appropriate color based on library fullness level
+  /// Returns appropriate color based on spaces fullness level
   /// Uses green to red spectrum for intuitive understanding
   static Color getFullnessColor(int fullness) {
     switch (fullness) {

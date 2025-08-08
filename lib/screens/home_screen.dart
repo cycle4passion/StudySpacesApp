@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import '../models/library.dart';
-import '../data/libraries_data.dart';
+import '../models/space.dart';
+import '../data/spaces_data.dart';
 import 'spaces_detail_screen.dart';
-import 'report_screen.dart';
 import '../utils/color_utils.dart';
-import '../utils/library_utils.dart';
+import '../utils/spaces_utils.dart';
 import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onThemeToggle;
   final bool isDarkMode;
   final VoidCallback onHomePressed;
-  final Function(Library)?
-  onReportPressed; // Changed to accept Library parameter
+  final Function(Space)? onReportPressed; // Changed to accept Space parameter
   final Function(int)? onTabTapped;
   final int? currentIndex;
 
@@ -26,26 +24,13 @@ class HomeScreen extends StatefulWidget {
     this.currentIndex,
   });
 
-  // TODO: darker green for darkmode?
-  // remove weighted average ui/code
-  // filter data as array ["24/7", "Open Now", "Favorites", "Reservations", "Open 2+hrs", "On Campus", "Off Campus"]
-  // accordion for filters
-  // submit space
-  // Pocketbase DB, subscription to fullness (live updates)
-  // backend - construction historic data, updating fullness
-  // add libraries to use apis
-  // load data from apis
-  // login/authentication
-  // leaderboard
-  // UI tweaks
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Library> spaces = [];
-  List<Library> filteredSpaces = [];
+  List<Space> spaces = [];
+  List<Space> filteredSpaces = [];
   Map<String, bool> favoriteStates = {};
 
   // Filter states
@@ -97,10 +82,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadSpaces() {
-    final data = json.decode(librariesJson);
-    final cornellLibraries = data['locations']['cornell'] as List;
+    final data = json.decode(spacesJson);
+    final cornellSpaces = data['locations']['cornell'] as List;
     setState(() {
-      spaces = cornellLibraries.map((lib) => Library.fromJson(lib)).toList();
+      spaces = cornellSpaces.map((lib) => Space.fromJson(lib)).toList();
       // Initialize favorite states from space data
       favoriteStates = {for (var space in spaces) space.id: space.isFavorite};
 
@@ -112,8 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
     filteredSpaces.sort((a, b) {
       final aFav = favoriteStates[a.id] ?? false;
       final bFav = favoriteStates[b.id] ?? false;
-      final aOpen = LibraryUtils.isOpen(a.openat, a.closeat);
-      final bOpen = LibraryUtils.isOpen(b.openat, b.closeat);
+      final aOpen = SpacesUtils.isOpen(a.openat, a.closeat);
+      final bOpen = SpacesUtils.isOpen(b.openat, b.closeat);
 
       // Create priority scores for each space
       // Higher score = higher priority (appears first)
@@ -161,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _sortSpaces();
   }
 
-  bool _spaceMatchesFilter(Library space, String filterName) {
+  bool _spaceMatchesFilter(Space space, String filterName) {
     switch (filterName) {
       case 'Printers':
         return space.features.any(
@@ -188,8 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  bool _spaceOpenForHours(Library space, int hours) {
-    if (!LibraryUtils.isOpen(space.openat, space.closeat)) {
+  bool _spaceOpenForHours(Space space, int hours) {
+    if (!SpacesUtils.isOpen(space.openat, space.closeat)) {
       return false;
     }
 
@@ -222,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 2,
             offset: const Offset(0, 1),
@@ -303,8 +288,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                         backgroundColor: filterColors[filterName],
-                        selectedColor: filterColors[filterName]?.withOpacity(
-                          0.8,
+                        selectedColor: filterColors[filterName]?.withValues(
+                          alpha: 0.8,
                         ),
                         checkmarkColor: Colors.black87,
                         shape: RoundedRectangleBorder(
@@ -430,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Adjust index for space items
                 final spaceIndex = index - 1;
                 final space = filteredSpaces[spaceIndex];
-                final bool isSpaceOpen = LibraryUtils.isOpen(
+                final bool isSpaceOpen = SpacesUtils.isOpen(
                   space.openat,
                   space.closeat,
                 );
@@ -456,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SpacesDetailScreen(
-                                  library: space,
+                                  space: space,
                                   onHomePressed: widget.onHomePressed,
                                   onTabTapped: widget.onTabTapped,
                                   currentIndex: widget.currentIndex,
@@ -691,7 +676,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   const SizedBox(width: 6),
                                                   Flexible(
                                                     child: Text(
-                                                      LibraryUtils.getFullnessText(
+                                                      SpacesUtils.getFullnessText(
                                                         space.fullness,
                                                       ),
                                                       overflow:
@@ -716,7 +701,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           if (!isSpaceOpen) const Spacer(),
                                           // Right side - Time status
                                           Text(
-                                            LibraryUtils.getTimeStatusText(
+                                            SpacesUtils.getTimeStatusText(
                                               space.openat,
                                               space.closeat,
                                             ),

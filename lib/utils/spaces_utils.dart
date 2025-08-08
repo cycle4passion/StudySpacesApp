@@ -1,5 +1,140 @@
-class LibraryUtils {
-  /// Checks if a library is currently open based on openat/closeat arrays
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:math';
+
+/// Enum for different types of geofence errors
+enum GeofenceErrorType {
+  permissionDenied,
+  locationServicesDisabled,
+  outsideGeofence,
+  locationError,
+}
+
+/// Result class for geofence checking with detailed error information
+class GeofenceResult {
+  final bool success;
+  final GeofenceErrorType? errorType;
+
+  GeofenceResult({required this.success, this.errorType});
+}
+
+class SpacesUtils {
+  /// Developer flag to bypass geofence for testing
+  static bool fakeLocation = false;
+
+  /// Result type for geofence checking with specific error information
+  static Future<GeofenceResult> geofenceWithDetails({
+    required double centerLat,
+    required double centerLon,
+    required double radiusMeters,
+  }) async {
+    // Allow bypass for development testing
+    if (fakeLocation) {
+      return GeofenceResult(success: true, errorType: null);
+    }
+
+    // Request permissions
+    var permission = await Permission.location.request();
+    if (!permission.isGranted) {
+      return GeofenceResult(
+        success: false,
+        errorType: GeofenceErrorType.permissionDenied,
+      );
+    }
+
+    // Check if location services are enabled
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      return GeofenceResult(
+        success: false,
+        errorType: GeofenceErrorType.locationServicesDisabled,
+      );
+    }
+
+    try {
+      // Get current location
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      double userLat = position.latitude;
+      double userLon = position.longitude;
+
+      // Haversine formula
+      const R = 6371000; // Earth radius in meters
+      double toRadians(double deg) => deg * (pi / 180);
+
+      final dLat = toRadians(userLat - centerLat);
+      final dLon = toRadians(userLon - centerLon);
+
+      final a =
+          pow(sin(dLat / 2), 2) +
+          cos(toRadians(centerLat)) *
+              cos(toRadians(userLat)) *
+              pow(sin(dLon / 2), 2);
+
+      final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+      final distance = R * c;
+
+      if (distance <= radiusMeters) {
+        return GeofenceResult(success: true, errorType: null);
+      } else {
+        return GeofenceResult(
+          success: false,
+          errorType: GeofenceErrorType.outsideGeofence,
+        );
+      }
+    } catch (e) {
+      return GeofenceResult(
+        success: false,
+        errorType: GeofenceErrorType.locationError,
+      );
+    }
+  }
+
+  /// Checks if user is within geofence of a study space
+  /// Uses latitude, longitude, and range from space data
+  static Future<bool> geofence({
+    required double centerLat,
+    required double centerLon,
+    required double radiusMeters,
+  }) async {
+    final result = await geofenceWithDetails(
+      centerLat: centerLat,
+      centerLon: centerLon,
+      radiusMeters: radiusMeters,
+    );
+    return result.success;
+  }
+
+  /// Checks if user is within reporting range of a specific space
+  /// Returns true if user can report on this space, false otherwise
+  static Future<bool> canReportAtSpace({
+    required double spaceLat,
+    required double spaceLon,
+    required double spaceRange,
+  }) async {
+    return await geofence(
+      centerLat: spaceLat,
+      centerLon: spaceLon,
+      radiusMeters: spaceRange,
+    );
+  }
+
+  /// Checks if user is within reporting range of a specific space with detailed error info
+  /// Returns GeofenceResult with success status and error type if applicable
+  static Future<GeofenceResult> canReportAtSpaceWithDetails({
+    required double spaceLat,
+    required double spaceLon,
+    required double spaceRange,
+  }) async {
+    return await geofenceWithDetails(
+      centerLat: spaceLat,
+      centerLon: spaceLon,
+      radiusMeters: spaceRange,
+    );
+  }
+
+  /// Checks if a space is currently open based on openat/closeat arrays
   /// Returns true if open, false if closed
   static bool isOpen(List<int> openat, List<int> closeat) {
     final now = DateTime.now();
@@ -20,14 +155,14 @@ class LibraryUtils {
     int openTime = openat[dayIndex];
     int closeTime = closeat[dayIndex];
 
-    // If either time is 0, the library is closed that day
+    // If either time is 0, the space is closed that day
     if (openTime == 0 || closeTime == 0) {
       return false;
     }
 
     // Handle overnight hours (e.g., open until 2am next day)
     if (closeTime < openTime) {
-      // Library closes after midnight
+      // Space closes after midnight
       // Open if current time is after opening OR before closing (next day)
       return currentTime >= openTime || currentTime <= closeTime;
     } else {
@@ -37,7 +172,7 @@ class LibraryUtils {
     }
   }
 
-  /// Returns human-readable text for library fullness level
+  /// Returns human-readable text for space fullness level
   static String getFullnessText(int fullness) {
     switch (fullness) {
       case 0:
@@ -159,15 +294,15 @@ class LibraryUtils {
       return '';
     }
 
-    bool libraryIsOpen = isOpen(openat, closeat);
+    bool spaceIsOpen = isOpen(openat, closeat);
 
-    if (libraryIsOpen) {
-      // Library is open, show when it closes
+    if (spaceIsOpen) {
+      // Space is open, show when it closes
       int closeTime = closeat[dayIndex];
       if (closeTime == 0) return '';
       return 'Closes at ${_formatMilitaryTime(closeTime)}';
     } else {
-      // Library is closed, show when it opens
+      // Space is closed, show when it opens
       int openTime = openat[dayIndex];
       if (openTime == 0) return 'Closed today';
       return 'Opens at ${_formatMilitaryTime(openTime)}';
@@ -252,7 +387,7 @@ class LibraryUtils {
     int openTime = openat[dayIndex];
     int closeTime = closeat[dayIndex];
 
-    // If either time is 0, the library is closed that day
+    // If either time is 0, the space is closed that day
     if (openTime == 0 || closeTime == 0) {
       // Find next opening day
       for (int i = 1; i <= 7; i++) {
@@ -279,10 +414,10 @@ class LibraryUtils {
           int hoursUntilOpen = timeUntilOpen.inHours;
 
           if (hoursUntilOpen < 24) {
-            return 'Opens in about ${hoursUntilOpen} hrs';
+            return 'Opens in about $hoursUntilOpen hrs';
           } else {
             int days = hoursUntilOpen ~/ 24;
-            return 'Opens in ${days} day${days == 1 ? '' : 's'}';
+            return 'Opens in $days day${days == 1 ? '' : 's'}';
           }
         }
       }
@@ -325,15 +460,15 @@ class LibraryUtils {
         if (minutesUntilClose < 10) {
           return 'Closes soon';
         } else {
-          return 'Closes in ${minutesUntilClose} min';
+          return 'Closes in $minutesUntilClose min';
         }
       } else if (hoursUntilClose < 2) {
         return 'Closes in about 1 hr';
       } else {
-        return 'Closes in about ${hoursUntilClose} hrs';
+        return 'Closes in about $hoursUntilClose hrs';
       }
     } else {
-      // Library is closed, calculate time until opening
+      // Space is closed, calculate time until opening
       int openHour = openTime ~/ 100;
       int openMinute = openTime % 100;
 
@@ -403,61 +538,16 @@ class LibraryUtils {
         if (minutesUntilOpen < 10) {
           return 'Opens soon';
         } else {
-          return 'Opens in ${minutesUntilOpen} min';
+          return 'Opens in $minutesUntilOpen min';
         }
       } else if (hoursUntilOpen < 2) {
         return 'Opens in about 1 hr';
       } else if (hoursUntilOpen < 24) {
-        return 'Opens in about ${hoursUntilOpen} hrs';
+        return 'Opens in about $hoursUntilOpen hrs';
       } else {
         int days = hoursUntilOpen ~/ 24;
-        return 'Opens in ${days} day${days == 1 ? '' : 's'}';
+        return 'Opens in $days day${days == 1 ? '' : 's'}';
       }
     }
   }
 }
-
-/* import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:math';
-
-Future<bool> geofence({
-  required double centerLat,
-  required double centerLon,
-  required double radiusMeters,
-}) async {
-  // Request permissions
-  var permission = await Permission.location.request();
-  if (!permission.isGranted) {
-    return false;
-  }
-
-  // Check if location services are enabled
-  if (!await Geolocator.isLocationServiceEnabled()) {
-    return false;
-  }
-
-  // Get current location
-  Position position = await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high,
-  );
-
-  double userLat = position.latitude;
-  double userLon = position.longitude;
-
-  // Haversine formula
-  const R = 6371000; // Earth radius in meters
-  double toRadians(double deg) => deg * (pi / 180);
-
-  final dLat = toRadians(userLat - centerLat);
-  final dLon = toRadians(userLon - centerLon);
-
-  final a = pow(sin(dLat / 2), 2) +
-      cos(toRadians(centerLat)) * cos(toRadians(userLat)) * pow(sin(dLon / 2), 2);
-
-  final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  final distance = R * c;
-
-  return distance <= radiusMeters;
-}
- */

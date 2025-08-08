@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/library.dart';
+import '../models/space.dart';
 import 'home_screen.dart';
 import 'report_screen.dart';
 import 'leaderboard_screen.dart';
@@ -21,14 +21,14 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
-  Library? _preselectedLibrary;
+  Space? _preselectedSpace;
 
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
-      // Clear preselected library when navigating manually
+      // Clear preselected space when navigating manually
       if (index != 1) {
-        _preselectedLibrary = null;
+        _preselectedSpace = null;
       }
     });
   }
@@ -39,9 +39,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     });
   }
 
-  void _goToReportWithLibrary(Library library) {
+  void _goToReportWithSpace(Space space) {
     setState(() {
-      _preselectedLibrary = library;
+      _preselectedSpace = space;
       _currentIndex = 1; // Navigate to report tab
     });
   }
@@ -53,13 +53,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         onThemeToggle: widget.onThemeToggle,
         isDarkMode: widget.isDarkMode,
         onHomePressed: _goToHome,
-        onReportPressed: _goToReportWithLibrary, // Pass the new callback
+        onReportPressed: _goToReportWithSpace, // Pass the new callback
         onTabTapped: _onTabTapped,
         currentIndex: _currentIndex,
       ),
       ReportScreen(
         onHomePressed: _goToHome,
-        preSelectedLibrary: _preselectedLibrary,
+        preSelectedSpace: _preselectedSpace,
       ),
       LeaderboardScreen(onHomePressed: _goToHome),
       ProfileScreen(onHomePressed: _goToHome),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../data/libraries_data.dart';
+import '../data/spaces_data.dart';
 import '../models/profile.dart';
 
 class LeaderboardEntry {
@@ -104,7 +104,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   }
 
   List<LeaderboardEntry> get currentLeaderboard {
-    final data = json.decode(librariesJson);
+    final data = json.decode(spacesJson);
     final leaderboardData = data['leaderboard'];
 
     List<dynamic> entries;

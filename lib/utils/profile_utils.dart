@@ -1,5 +1,5 @@
 import 'dart:convert';
-import '../data/libraries_data.dart';
+import '../data/spaces_data.dart';
 import '../models/profile.dart';
 
 class ProfileUtils {

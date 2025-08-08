@@ -1,3 +1,3 @@
 // Export all models
-export 'library.dart';
+export 'space.dart';
 export 'profile.dart';

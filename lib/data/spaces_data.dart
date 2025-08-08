@@ -1,5 +1,5 @@
-// StudySpaces JSON data for Cornell libraries and leaderboard
-const String librariesJson = '''
+// StudySpaces JSON data for Cornell spaces and leaderboard
+const String spacesJson = '''
 {
   "locations": {
     "cornell": [

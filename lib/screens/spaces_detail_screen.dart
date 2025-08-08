@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/library.dart';
-import '../utils/library_utils.dart';
-import '../utils/color_utils.dart';
+import '../models/space.dart';
+import '../utils/spaces_utils.dart';
 
 class SpacesDetailScreen extends StatefulWidget {
-  final Library library;
+  final Space space;
   final VoidCallback onHomePressed;
   final Function(int)? onTabTapped;
   final int? currentIndex;
 
   const SpacesDetailScreen({
     super.key,
-    required this.library,
+    required this.space,
     required this.onHomePressed,
     this.onTabTapped,
     this.currentIndex,
@@ -70,11 +69,6 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isOpen = LibraryUtils.isOpen(
-      widget.library.openat,
-      widget.library.closeat,
-    );
-
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -97,7 +91,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
             ),
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
-                widget.library.name,
+                widget.space.name,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -111,12 +105,12 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
                 ),
               ),
               background: Hero(
-                tag: 'space-image-${widget.library.id}',
+                tag: 'space-image-${widget.space.id}',
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
                     Image.asset(
-                      widget.library.image,
+                      widget.space.image,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -131,7 +125,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
                             ),
                           ),
                           child: Icon(
-                            Icons.local_library,
+                            Icons.school,
                             size: 80,
                             color: Colors.white.withValues(alpha: 0.8),
                           ),
@@ -171,7 +165,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       // Show Reserve Space button only if space has reservationid
-                      if (widget.library.reservationid != null)
+                      if (widget.space.reservationid != null)
                         ElevatedButton.icon(
                           onPressed: () => _showReservationModal(context),
                           icon: const Icon(Icons.event_seat, size: 18),
@@ -202,14 +196,14 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
                     context,
                     Icons.people,
                     'Capacity',
-                    '${widget.library.capacity} people',
+                    '${widget.space.capacity} people',
                   ),
                   const SizedBox(height: 12),
                   _buildDetailCard(
                     context,
                     Icons.layers,
                     'Floors',
-                    '${widget.library.floors} floors',
+                    '${widget.space.floors} floors',
                   ),
                   const SizedBox(height: 12),
                   _buildAddressCard(context),
@@ -246,7 +240,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              widget.library.category,
+              widget.space.category,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
@@ -292,7 +286,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
   Widget _buildAddressCard(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () => _openDirections(widget.library.address),
+        onTap: () => _openDirections(widget.space.address),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -319,7 +313,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                widget.library.address,
+                widget.space.address,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.green.shade700,
                   decoration: TextDecoration.underline,
@@ -335,7 +329,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
   Widget _buildPhoneCard(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () => _makePhoneCall(widget.library.phone),
+        onTap: () => _makePhoneCall(widget.space.phone),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -358,7 +352,7 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                widget.library.phone,
+                widget.space.phone,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.green.shade700,
                   decoration: TextDecoration.underline,
@@ -411,14 +405,14 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
   }
 
   Widget _buildEnhancedHoursCard(BuildContext context) {
-    final isOpen = LibraryUtils.isOpen(
-      widget.library.openat,
-      widget.library.closeat,
+    final isOpen = SpacesUtils.isOpen(
+      widget.space.openat,
+      widget.space.closeat,
     );
 
-    final statusText = LibraryUtils.getTimeStatusText(
-      widget.library.openat,
-      widget.library.closeat,
+    final statusText = SpacesUtils.getTimeStatusText(
+      widget.space.openat,
+      widget.space.closeat,
     );
 
     return Card(
@@ -508,14 +502,14 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
 
     return Column(
       children: List.generate(days.length, (index) {
-        if (index >= widget.library.openat.length ||
-            index >= widget.library.closeat.length) {
+        if (index >= widget.space.openat.length ||
+            index >= widget.space.closeat.length) {
           return const SizedBox.shrink();
         }
 
         final isToday = index == currentDayIndex;
-        final openTime = widget.library.openat[index];
-        final closeTime = widget.library.closeat[index];
+        final openTime = widget.space.openat[index];
+        final closeTime = widget.space.closeat[index];
 
         String hoursText;
         if (openTime == 0 || closeTime == 0) {
@@ -526,9 +520,9 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
         }
 
         // Check if space is currently open (for today's highlighting)
-        final isCurrentlyOpen = LibraryUtils.isOpen(
-          widget.library.openat,
-          widget.library.closeat,
+        final isCurrentlyOpen = SpacesUtils.isOpen(
+          widget.space.openat,
+          widget.space.closeat,
         );
 
         return Container(
@@ -579,6 +573,6 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
     final period = hours >= 12 ? 'PM' : 'AM';
     final displayHours = hours > 12 ? hours - 12 : (hours == 0 ? 12 : hours);
 
-    return '${displayHours}:${minutes.toString().padLeft(2, '0')} $period';
+    return '$displayHours:${minutes.toString().padLeft(2, '0')} $period';
   }
 }
