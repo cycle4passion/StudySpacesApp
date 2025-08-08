@@ -20,7 +20,6 @@ const String spacesJson = '''
         "floors": 5,
         "capacity": 800,
         "fullness": 3,
-        "isFavorite": true,
         "phone": "(607) 255-4144"
       },
       {
@@ -40,7 +39,6 @@ const String spacesJson = '''
         "floors": 4,
         "capacity": 600,
         "fullness": 4,
-        "isFavorite": false,
         "phone": "(607) 255-4144"
       },
       {
@@ -60,7 +58,6 @@ const String spacesJson = '''
         "floors": 3,
         "capacity": 400,
         "fullness": 2,
-        "isFavorite": true,
         "phone": "(607) 255-3296"
       },
       {
@@ -80,7 +77,6 @@ const String spacesJson = '''
         "floors": 2,
         "capacity": 300,
         "fullness": 5,
-        "isFavorite": false,
         "phone": "(607) 255-4144"
       },
       {
@@ -99,7 +95,6 @@ const String spacesJson = '''
         "floors": 3,
         "capacity": 200,
         "fullness": 1,
-        "isFavorite": true,
         "phone": "(607) 255-3530"
       },
       {
@@ -118,7 +113,6 @@ const String spacesJson = '''
         "floors": 2,
         "capacity": 150,
         "fullness": 2,
-        "isFavorite": false,
         "phone": "(607) 255-3710"
       },
       {
@@ -137,7 +131,6 @@ const String spacesJson = '''
         "floors": 2,
         "capacity": 100,
         "fullness": 1,
-        "isFavorite": true,
         "phone": "(607) 255-4011"
       },
       {
@@ -156,7 +149,6 @@ const String spacesJson = '''
         "floors": 4,
         "capacity": 500,
         "fullness": 3,
-        "isFavorite": false,
         "phone": "(607) 255-7236"
       },
       {
@@ -176,7 +168,6 @@ const String spacesJson = '''
         "floors": 2,
         "capacity": 250,
         "fullness": 2,
-        "isFavorite": false,
         "phone": "(607) 255-2277"
       }
     ]
@@ -240,7 +231,10 @@ const String profileJson = '''
   "profile": {
     "id": "j9999",
     "reports": [1, 3, 5, 22],
-    "rank": [934, 432, 453, 1]
+    "rank": [934, 432, 453, 1],
+    "favorites": [
+      "catherwood", "mann", "olin"
+    ]
   }
 }
 ''';

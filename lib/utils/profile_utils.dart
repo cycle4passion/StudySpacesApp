@@ -61,4 +61,33 @@ class ProfileUtils {
     final profile = loadProfile();
     return profile.id;
   }
+
+  /// Get favorite spaces
+  static List<String> getFavoriteSpaces() {
+    final profile = loadProfile();
+    return profile.favoriteSpaces;
+  }
+
+  /// Check if a space is favorite
+  static bool isSpaceFavorite(String spaceId) {
+    final profile = loadProfile();
+    return profile.isFavorite(spaceId);
+  }
+
+  /// Get time period specific data
+  static Map<String, Map<String, int>> getTimePeriodData() {
+    final profile = loadProfile();
+    return {
+      'Daily': {'reports': profile.dailyReports, 'rank': profile.dailyRank},
+      'Weekly': {'reports': profile.weeklyReports, 'rank': profile.weeklyRank},
+      'Monthly': {
+        'reports': profile.monthlyReports,
+        'rank': profile.monthlyRank,
+      },
+      'All-Time': {
+        'reports': profile.alltimeReports,
+        'rank': profile.alltimeRank,
+      },
+    };
+  }
 }

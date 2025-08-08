@@ -15,7 +15,6 @@ class Space {
   final int floors;
   final int capacity;
   final int fullness;
-  final bool isFavorite;
   final String phone;
 
   Space({
@@ -35,7 +34,6 @@ class Space {
     required this.floors,
     required this.capacity,
     required this.fullness,
-    required this.isFavorite,
     required this.phone,
   });
 
@@ -57,7 +55,6 @@ class Space {
       floors: json['floors'],
       capacity: json['capacity'],
       fullness: json['fullness'],
-      isFavorite: json['isFavorite'],
       phone: json['phone'],
     );
   }
@@ -81,7 +78,6 @@ class Space {
       'floors': floors,
       'capacity': capacity,
       'fullness': fullness,
-      'isFavorite': isFavorite,
       'phone': phone,
     };
   }

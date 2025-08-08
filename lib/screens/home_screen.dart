@@ -5,6 +5,7 @@ import 'space_details_screen.dart';
 import 'add_space_screen.dart';
 import '../utils/color_utils.dart';
 import '../utils/spaces_utils.dart';
+import '../utils/profile_utils.dart';
 import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
@@ -87,8 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final cornellSpaces = data['locations']['cornell'] as List;
     setState(() {
       spaces = cornellSpaces.map((lib) => Space.fromJson(lib)).toList();
-      // Initialize favorite states from space data
-      favoriteStates = {for (var space in spaces) space.id: space.isFavorite};
+      // Initialize favorite states from profile data
+      final favoriteSpaceIds = ProfileUtils.getFavoriteSpaces();
+      favoriteStates = {
+        for (var space in spaces) space.id: favoriteSpaceIds.contains(space.id),
+      };
 
       _applyFilters();
     });

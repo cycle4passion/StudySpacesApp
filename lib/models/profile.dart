@@ -2,19 +2,26 @@ class Profile {
   final String id;
   final List<int> reports;
   final List<int> rank;
+  final List<String> favorites;
 
-  Profile({required this.id, required this.reports, required this.rank});
+  Profile({
+    required this.id,
+    required this.reports,
+    required this.rank,
+    required this.favorites,
+  });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
       id: json['id'] as String,
       reports: (json['reports'] as List<dynamic>).cast<int>(),
       rank: (json['rank'] as List<dynamic>).cast<int>(),
+      favorites: (json['favorites'] as List<dynamic>).cast<String>(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'reports': reports, 'rank': rank};
+    return {'id': id, 'reports': reports, 'rank': rank, 'favorites': favorites};
   }
 
   // Helper methods for reports
@@ -44,4 +51,22 @@ class Profile {
     if (rank.length < 2) return false;
     return rank.last < rank[rank.length - 2];
   }
+
+  // Helper methods for favorites
+  bool isFavorite(String spaceId) {
+    return favorites.contains(spaceId);
+  }
+
+  List<String> get favoriteSpaces => List.from(favorites);
+
+  // Helper methods for time period specific data
+  int get dailyReports => reports.isNotEmpty ? reports[0] : 0;
+  int get weeklyReports => reports.length > 1 ? reports[1] : 0;
+  int get monthlyReports => reports.length > 2 ? reports[2] : 0;
+  int get alltimeReports => reports.length > 3 ? reports[3] : 0;
+
+  int get dailyRank => rank.isNotEmpty ? rank[0] : 0;
+  int get weeklyRank => rank.length > 1 ? rank[1] : 0;
+  int get monthlyRank => rank.length > 2 ? rank[2] : 0;
+  int get alltimeRank => rank.length > 3 ? rank[3] : 0;
 }
