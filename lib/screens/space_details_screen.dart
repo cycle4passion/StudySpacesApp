@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../models/space.dart';
 import '../utils/spaces_utils.dart';
 
@@ -23,48 +25,140 @@ class SpaceDetailsScreen extends StatefulWidget {
 
 class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
   bool isExpanded = false;
+  WebViewController? _webViewController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Only initialize WebView controller on platforms that support it
+    if (!kIsWeb) {
+      _webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (String url) {
+              // Optional: Show loading indicator
+            },
+            onPageFinished: (String url) {
+              // Optional: Hide loading indicator
+            },
+            onWebResourceError: (WebResourceError error) {
+              // Optional: Handle errors
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error loading page: ${error.description}'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        );
+    }
+  }
 
   void _showReservationModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Reserve Study Space',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const Expanded(
-              child: Center(
-                child: Text(
-                  'Reservation system coming soon!',
-                  style: TextStyle(fontSize: 16),
+    final reservationUrl =
+        'https://spaces.library.cornell.edu/spaces?lid=${widget.space.reservationid}';
+
+    // For web platform, open in new tab
+    if (kIsWeb) {
+      _openUrlInNewTab(reservationUrl);
+      return;
+    }
+
+    // For mobile platforms, show fullscreen WebView modal
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => Scaffold(
+          body: Column(
+            children: [
+              // Green title bar with cancel button
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top,
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                ),
+                decoration: BoxDecoration(color: Colors.green.shade600),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.event_seat, color: Colors.white, size: 24),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Reserve ${widget.space.name}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              // WebView
+              Expanded(
+                child: _webViewController != null
+                    ? WebViewWidget(
+                        controller: _webViewController!
+                          ..loadRequest(Uri.parse(reservationUrl)),
+                      )
+                    : const Center(
+                        child: Text('WebView not supported on this platform'),
+                      ),
+              ),
+            ],
+          ),
         ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+
+          var tween = Tween(begin: begin, end: end).chain(
+            CurveTween(curve: curve),
+          );
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
+  }
+
+  void _openUrlInNewTab(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open reservation system'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
