@@ -157,306 +157,302 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               12, // Increased from 8 for better balance
               6, // Reduced from 8
               12, // Increased from 8 for better balance
-              3, // Reduced from 4
+              1, // Reduced from 3 to decrease space to leaderboard
             ),
-            padding: const EdgeInsets.all(3), // Reduced from 4
-            decoration: BoxDecoration(
-              color: Colors.green.withValues(
-                alpha: 0.1,
-              ), // Very light green instead of grey
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(color: Colors.grey.shade300, width: 1),
-              boxShadow: Theme.of(context).brightness == Brightness.dark
-                  ? [] // Remove shadows in dark mode to eliminate halo effect
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final itemWidth =
-                    constraints.maxWidth /
-                    periods.length; // Equal width distribution
-                final selectedIndex = periods.indexOf(selectedPeriod);
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(3), // Reduced from 4
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(
+                    alpha: 0.1,
+                  ), // Very light green instead of grey
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: Colors.grey.shade300, width: 1),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final itemWidth =
+                        constraints.maxWidth /
+                        periods.length; // Equal width distribution
+                    final selectedIndex = periods.indexOf(selectedPeriod);
 
-                return SizedBox(
-                  height: 44, // Reduced from 52
-                  child: Stack(
-                    children: [
-                      // Animated background pill
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        left:
-                            selectedIndex * itemWidth +
-                            3, // Reduced padding offset
-                        top: 3, // Reduced from 4
-                        bottom: 3, // Reduced from 4
-                        width: itemWidth - 6, // Reduced from 8
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(26),
-                            boxShadow:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? [] // Remove shadows in dark mode to eliminate halo effect
-                                : [
-                                    BoxShadow(
-                                      color: Colors.green.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
-                                      ),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, -1),
-                                    ),
-                                  ],
+                    return SizedBox(
+                      height: 44, // Reduced from 52
+                      child: Stack(
+                        children: [
+                          // Animated background pill
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            left:
+                                selectedIndex * itemWidth +
+                                3, // Reduced padding offset
+                            top: 3, // Reduced from 4
+                            bottom: 3, // Reduced from 4
+                            width: itemWidth - 6, // Reduced from 8
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(26),
+                                boxShadow:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? [] // Remove shadows in dark mode to eliminate halo effect
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.green.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                        BoxShadow(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, -1),
+                                        ),
+                                      ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      // Text buttons
-                      Row(
-                        children: periods.map((period) {
-                          final isSelected = selectedPeriod == period;
-                          return GestureDetector(
-                            onTap: () {
-                              _animateToNewPeriod(period);
-                            },
-                            child: SizedBox(
-                              width: itemWidth, // Fixed width for each button
-                              height: 44, // Reduced from 52
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Center(
-                                  child: AnimatedDefaultTextStyle(
-                                    duration: const Duration(milliseconds: 200),
-                                    style: TextStyle(
-                                      color: isSelected
-                                          ? Colors.white
-                                          : Colors.grey.shade600,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w700
-                                          : FontWeight.w500,
-                                      fontSize: 14, // Increased from 12
-                                      letterSpacing: 0.3,
-                                    ),
-                                    child: Text(
-                                      period,
-                                      textAlign: TextAlign.center,
+                          // Text buttons
+                          Row(
+                            children: periods.map((period) {
+                              final isSelected = selectedPeriod == period;
+                              return GestureDetector(
+                                onTap: () {
+                                  _animateToNewPeriod(period);
+                                },
+                                child: SizedBox(
+                                  width:
+                                      itemWidth, // Fixed width for each button
+                                  height: 44, // Reduced from 52
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: Center(
+                                      child: AnimatedDefaultTextStyle(
+                                        duration: const Duration(
+                                          milliseconds: 200,
+                                        ),
+                                        style: TextStyle(
+                                          color: isSelected
+                                              ? Colors.white
+                                              : Colors.grey.shade600,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w500,
+                                          fontSize: 14, // Increased from 12
+                                          letterSpacing: 0.3,
+                                        ),
+                                        child: Text(
+                                          period,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ),
             ),
           ),
 
           // Leaderboard List
-          Expanded(
+          Flexible(
             child: SlideTransition(
               position: _slideAnimation,
               child: Container(
                 margin: const EdgeInsets.fromLTRB(
                   12, // Reduced from 16
-                  6, // Reduced from 8
+                  2, // Reduced from 6 to decrease space from selector
                   12, // Reduced from 16
                   16,
                 ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Theme.of(context).brightness == Brightness.dark
-                      ? Border.all(
-                          color: Colors.grey.withValues(alpha: 0.3),
-                          width: 1,
-                        )
-                      : null,
-                  boxShadow: [
-                    // Primary shadow
-                    BoxShadow(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black.withValues(alpha: 0.5)
-                          : Colors.grey.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                      spreadRadius: 2,
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Theme.of(context).brightness == Brightness.dark
+                          ? Border.all(
+                              color: Colors.grey.withValues(alpha: 0.3),
+                              width: 1,
+                            )
+                          : null,
                     ),
-                    // Secondary shadow for depth
-                    BoxShadow(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black.withValues(alpha: 0.3)
-                          : Colors.grey.withValues(alpha: 0.15),
-                      blurRadius: 40,
-                      offset: const Offset(0, 16),
-                      spreadRadius: 4,
-                    ),
-                  ],
-                ),
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(4), // Reduced from 8
-                  itemCount: currentLeaderboard.length,
-                  separatorBuilder: (context, index) {
-                    // Check if the next item (index + 1) is the user at position 10
-                    final nextIndex = index + 1;
-                    final isUserAtPosition10 =
-                        nextIndex < currentLeaderboard.length &&
-                        currentLeaderboard[nextIndex].name == 'j9999' &&
-                        nextIndex == 9; // Position 10 (0-based index 9)
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(4), // Reduced from 8
+                      itemCount: currentLeaderboard.length,
+                      separatorBuilder: (context, index) {
+                        // Check if the next item (index + 1) is the user at position 10
+                        final nextIndex = index + 1;
+                        final isUserAtPosition10 =
+                            nextIndex < currentLeaderboard.length &&
+                            currentLeaderboard[nextIndex].name == 'j9999' &&
+                            nextIndex == 9; // Position 10 (0-based index 9)
 
-                    if (isUserAtPosition10) {
-                      // Dashed divider for user entry
-                      return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 0.5),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: CustomPaint(
-                                size: const Size(double.infinity, 2),
-                                painter: DashedLinePainter(
-                                  color: Colors.green.withValues(alpha: 0.7),
-                                  dashWidth: 6,
-                                  dashSpace: 4,
-                                  strokeWidth: 2,
+                        if (isUserAtPosition10) {
+                          // Dashed divider for user entry
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 0.5),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: CustomPaint(
+                                    size: const Size(double.infinity, 2),
+                                    painter: DashedLinePainter(
+                                      color: Colors.green.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                      dashWidth: 6,
+                                      dashSpace: 4,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      // Regular divider
-                      return Divider(
-                        color: Colors.grey.shade200,
-                        thickness: 1,
-                        height: 1,
-                      );
-                    }
-                  },
-                  itemBuilder: (context, index) {
-                    final entry = currentLeaderboard[index];
-                    final rank = index + 1;
+                          );
+                        } else {
+                          // Regular divider
+                          return Divider(
+                            color: Colors.grey.shade200,
+                            thickness: 1,
+                            height: 1,
+                          );
+                        }
+                      },
+                      itemBuilder: (context, index) {
+                        final entry = currentLeaderboard[index];
+                        final rank = index + 1;
 
-                    // Use actual user rank for j9999, otherwise use position
-                    final displayRank = entry.name == 'j9999'
-                        ? _getUserRankForPeriod(selectedPeriod)
-                        : rank;
+                        // Use actual user rank for j9999, otherwise use position
+                        final displayRank = entry.name == 'j9999'
+                            ? _getUserRankForPeriod(selectedPeriod)
+                            : rank;
 
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 0.2,
-                      ), // Reduced from 0.4
-                      decoration: BoxDecoration(
-                        color: index % 2 == 0
-                            ? Colors.green.withValues(
-                                alpha: 0.05,
-                              ) // Light green for even indices
-                            : Colors.white, // White for odd indices
-                        borderRadius: rank == 1
-                            ? const BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
-                              )
-                            : rank == currentLeaderboard.length
-                            ? const BorderRadius.only(
-                                bottomLeft: Radius.circular(16),
-                                bottomRight: Radius.circular(16),
-                              )
-                            : null,
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 6, // Reduced from 8
-                          vertical: 0, // Keep at 0
-                        ),
-                        leading: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 32, // Increased from 24
-                              height: 32, // Increased from 24
-                              decoration: BoxDecoration(
-                                color: _getRankBadgeColor(rank),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _getRankBadgeColor(
-                                      rank,
-                                    ).withValues(alpha: 0.3),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 0.2,
+                          ), // Reduced from 0.4
+                          decoration: BoxDecoration(
+                            color: index % 2 == 0
+                                ? Colors.green.withValues(
+                                    alpha: 0.05,
+                                  ) // Light green for even indices
+                                : Colors.white, // White for odd indices
+                            borderRadius: rank == 1
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16),
+                                  )
+                                : rank == currentLeaderboard.length
+                                ? const BorderRadius.only(
+                                    bottomLeft: Radius.circular(16),
+                                    bottomRight: Radius.circular(16),
+                                  )
+                                : null,
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 6, // Reduced from 8
+                              vertical: 0, // Keep at 0
+                            ),
+                            leading: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 32, // Increased from 24
+                                  height: 32, // Increased from 24
+                                  decoration: BoxDecoration(
+                                    color: _getRankBadgeColor(rank),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _getRankBadgeColor(
+                                          rank,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '$displayRank',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            11, // Increased from 9 to fit larger circle
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                if (rank <= 3) ...[
+                                  const SizedBox(width: 4), // Keep spacing same
+                                  Icon(
+                                    _getRankIcon(rank),
+                                    color: _getRankIconColor(rank),
+                                    size: 32, // Increased from 26
                                   ),
                                 ],
+                              ],
+                            ),
+                            title: Text(
+                              entry.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16, // Increased from 14
+                                color: Colors
+                                    .grey
+                                    .shade800, // Consistent text color
                               ),
-                              child: Center(
-                                child: Text(
-                                  '$displayRank',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize:
-                                        11, // Increased from 9 to fit larger circle
-                                  ),
+                            ),
+                            trailing: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12, // Increased from 8
+                                vertical: 6, // Increased from 4
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withValues(
+                                  alpha: 0.1,
+                                ), // Consistent badge color
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${entry.reports} ${entry.reports == 1 ? 'Report' : 'Reports'}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14, // Increased from 12
+                                  color: Colors.green, // Consistent text color
                                 ),
                               ),
                             ),
-                            if (rank <= 3) ...[
-                              const SizedBox(width: 4), // Keep spacing same
-                              Icon(
-                                _getRankIcon(rank),
-                                color: _getRankIconColor(rank),
-                                size: 32, // Increased from 26
-                              ),
-                            ],
-                          ],
-                        ),
-                        title: Text(
-                          entry.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16, // Increased from 14
-                            color:
-                                Colors.grey.shade800, // Consistent text color
                           ),
-                        ),
-                        trailing: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12, // Increased from 8
-                            vertical: 6, // Increased from 4
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withValues(
-                              alpha: 0.1,
-                            ), // Consistent badge color
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '${entry.reports} ${entry.reports == 1 ? 'Report' : 'Reports'}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14, // Increased from 12
-                              color: Colors.green, // Consistent text color
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),
