@@ -99,22 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
     
     // Reload the spaces data
     _loadSpaces();
-    
-    // Show a brief feedback message
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Study spaces refreshed'),
-          duration: const Duration(seconds: 2),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      );
-    }
   }
 
   void _sortSpaces() {
