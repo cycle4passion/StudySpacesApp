@@ -18,12 +18,14 @@ class LeaderboardScreen extends StatefulWidget {
   final VoidCallback? onHomePressed;
   final Function(int)? onTabTapped;
   final int? currentIndex;
+  final String? initialPeriod;
 
   const LeaderboardScreen({
     super.key,
     this.onHomePressed,
     this.onTabTapped,
     this.currentIndex,
+    this.initialPeriod,
   });
 
   @override
@@ -42,6 +44,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   @override
   void initState() {
     super.initState();
+
+    // Set initial period if provided
+    if (widget.initialPeriod != null &&
+        periods.contains(widget.initialPeriod)) {
+      selectedPeriod = widget.initialPeriod!;
+      _previousIndex = periods.indexOf(selectedPeriod);
+    }
+
     _loadUserProfile();
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 300),
@@ -56,6 +66,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   void _loadUserProfile() {
     final data = json.decode(profileJson);
     _userProfile = Profile.fromJson(data['profile']);
+  }
+
+  void updatePeriod(String newPeriod) {
+    if (periods.contains(newPeriod) && newPeriod != selectedPeriod) {
+      setState(() {
+        selectedPeriod = newPeriod;
+      });
+    }
   }
 
   int _getUserRankForPeriod(String period) {
@@ -461,37 +479,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           ),
         ],
       ),
-      bottomNavigationBar: widget.onTabTapped != null
-          ? BottomNavigationBar(
-              currentIndex: widget.currentIndex ?? 0,
-              onTap: widget.onTabTapped,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.green,
-              selectedItemColor: Theme.of(context).colorScheme.onPrimary,
-              unselectedItemColor: Theme.of(
-                context,
-              ).colorScheme.onPrimary.withValues(alpha: 0.7),
-              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-              unselectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.normal,
-              ),
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.campaign),
-                  label: 'Report',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.leaderboard),
-                  label: 'Leaderboard',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Profile',
-                ),
-              ],
-            )
-          : null,
     );
   }
 

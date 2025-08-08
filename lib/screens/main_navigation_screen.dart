@@ -22,10 +22,23 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
   Space? _preselectedSpace;
+  final GlobalKey _leaderboardKey = GlobalKey();
 
-  void _onTabTapped(int index) {
+  void _onTabTapped(int index, [String? leaderboardPeriod]) {
     setState(() {
       _currentIndex = index;
+
+      // If navigating to leaderboard with a specific period, update it
+      if (index == 2 && leaderboardPeriod != null) {
+        // Use a post frame callback to ensure the widget is built
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final leaderboardState = _leaderboardKey.currentState;
+          if (leaderboardState != null) {
+            (leaderboardState as dynamic).updatePeriod(leaderboardPeriod);
+          }
+        });
+      }
+
       // Clear preselected space when navigating manually
       if (index != 1) {
         _preselectedSpace = null;
@@ -61,8 +74,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         onHomePressed: _goToHome,
         preSelectedSpace: _preselectedSpace,
       ),
-      LeaderboardScreen(onHomePressed: _goToHome),
-      ProfileScreen(onHomePressed: _goToHome),
+      LeaderboardScreen(
+        key: _leaderboardKey,
+        onHomePressed: _goToHome,
+        onTabTapped: _onTabTapped,
+        currentIndex: _currentIndex,
+      ),
+      ProfileScreen(onHomePressed: _goToHome, onTabTapped: _onTabTapped),
     ];
 
     return Scaffold(

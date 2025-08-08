@@ -102,3 +102,5 @@ flutter_launcher_icons:
   ios: true
   image_path: 'assets/icon/icon.png'
   min_sdk_android: 21 # android min sdk min:16, default 21
+  # Ensure proper iOS icon generation
+  remove_alpha_ios: true

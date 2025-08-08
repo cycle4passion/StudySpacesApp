@@ -3,8 +3,13 @@ import '../utils/profile_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   final VoidCallback onHomePressed;
+  final Function(int, [String?])? onTabTapped;
 
-  const ProfileScreen({super.key, required this.onHomePressed});
+  const ProfileScreen({
+    super.key,
+    required this.onHomePressed,
+    this.onTabTapped,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -53,6 +58,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Logged out successfully!')));
+  }
+
+  void _navigateToLeaderboard(String period) {
+    // Navigate to leaderboard tab with the specified period
+    if (widget.onTabTapped != null) {
+      widget.onTabTapped!(
+        2,
+        _convertPeriodName(period),
+      ); // Index 2 is leaderboard tab
+    }
+  }
+
+  String _convertPeriodName(String period) {
+    // Convert period names to match leaderboard screen format
+    switch (period) {
+      case 'Daily':
+        return 'Day';
+      case 'Weekly':
+        return 'Week';
+      case 'Monthly':
+        return 'Month';
+      case 'All-Time':
+        return 'All Time';
+      default:
+        return 'Week';
+    }
   }
 
   Widget _buildProfileHeader() {
@@ -212,40 +243,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, color: color, size: 20),
-                Text(
-                  period,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Reports: $reports',
-              style: TextStyle(fontSize: 14, color: color),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Rank: #$rank',
-              style: TextStyle(
-                fontSize: 14,
-                color: color.withValues(alpha: 0.8),
+      child: InkWell(
+        onTap: () => _navigateToLeaderboard(period),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(icon, color: color, size: 20),
+                  Text(
+                    period,
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  ),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Reports: $reports',
+                style: TextStyle(fontSize: 14, color: color),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Rank: #$rank',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: color.withValues(alpha: 0.8),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(
+                    Icons.leaderboard,
+                    size: 12,
+                    color: Colors.grey.shade500,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Tap to view leaderboard',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey.shade500,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
