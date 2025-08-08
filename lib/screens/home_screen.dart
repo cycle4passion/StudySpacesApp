@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/space.dart';
 import '../data/spaces_data.dart';
-import 'spaces_detail_screen.dart';
+import 'space_details_screen.dart';
 import '../utils/color_utils.dart';
 import '../utils/spaces_utils.dart';
 import 'dart:convert';
@@ -457,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            SpacesDetailScreen(
+                                            SpaceDetailsScreen(
                                               space: space,
                                               onHomePressed:
                                                   widget.onHomePressed,

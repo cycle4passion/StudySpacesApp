@@ -3,13 +3,13 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/space.dart';
 import '../utils/spaces_utils.dart';
 
-class SpacesDetailScreen extends StatefulWidget {
+class SpaceDetailsScreen extends StatefulWidget {
   final Space space;
   final VoidCallback onHomePressed;
   final Function(int)? onTabTapped;
   final int? currentIndex;
 
-  const SpacesDetailScreen({
+  const SpaceDetailsScreen({
     super.key,
     required this.space,
     required this.onHomePressed,
@@ -18,10 +18,10 @@ class SpacesDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<SpacesDetailScreen> createState() => _SpacesDetailScreenState();
+  State<SpaceDetailsScreen> createState() => _SpaceDetailsScreenState();
 }
 
-class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
+class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
   bool isExpanded = false;
 
   void _showReservationModal(BuildContext context) {
@@ -206,6 +206,8 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
                     '${widget.space.floors} floors',
                   ),
                   const SizedBox(height: 12),
+                  _buildFeaturesCard(context),
+                  const SizedBox(height: 12),
                   _buildAddressCard(context),
                   const SizedBox(height: 12),
                   _buildPhoneCard(context),
@@ -276,6 +278,84 @@ class _SpacesDetailScreenState extends State<SpacesDetailScreen> {
                   Text(value, style: Theme.of(context).textTheme.bodyLarge),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturesCard(BuildContext context) {
+    // ROYGBIV color scheme
+    final List<Color> roygbivColors = [
+      Colors.red,
+      Colors.orange,
+      Colors.yellow,
+      Colors.green,
+      Colors.blue,
+      Colors.indigo,
+      Colors.purple,
+    ];
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.star, size: 24, color: Colors.green),
+                const SizedBox(width: 16),
+                Text(
+                  'Features',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: widget.space.features.asMap().entries.map((entry) {
+                final int index = entry.key;
+                final String feature = entry.value;
+                final Color backgroundColor =
+                    roygbivColors[index % roygbivColors.length];
+
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 6.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: backgroundColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20.0),
+                    border: Border.all(color: backgroundColor, width: 1.5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        size: 16,
+                        color: backgroundColor,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        feature,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
