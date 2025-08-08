@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/library.dart';
 import '../data/libraries_data.dart';
-import 'library_detail_screen.dart';
+import 'spaces_detail_screen.dart';
 import 'report_screen.dart';
 import '../utils/color_utils.dart';
 import '../utils/library_utils.dart';
@@ -11,7 +11,8 @@ class HomeScreen extends StatefulWidget {
   final VoidCallback onThemeToggle;
   final bool isDarkMode;
   final VoidCallback onHomePressed;
-  final VoidCallback? onReportPressed; // Add this property
+  final Function(Library)?
+  onReportPressed; // Changed to accept Library parameter
   final Function(int)? onTabTapped;
   final int? currentIndex;
 
@@ -43,8 +44,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Library> libraries = [];
-  List<Library> filteredLibraries = [];
+  List<Library> spaces = [];
+  List<Library> filteredSpaces = [];
   Map<String, bool> favoriteStates = {};
 
   // Filter states
@@ -92,51 +93,64 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadLibraries();
+    _loadSpaces();
   }
 
-  void _loadLibraries() {
+  void _loadSpaces() {
     final data = json.decode(librariesJson);
     final cornellLibraries = data['locations']['cornell'] as List;
     setState(() {
-      libraries = cornellLibraries.map((lib) => Library.fromJson(lib)).toList();
-      // Initialize favorite states from library data
-      favoriteStates = {for (var lib in libraries) lib.id: lib.isFavorite};
+      spaces = cornellLibraries.map((lib) => Library.fromJson(lib)).toList();
+      // Initialize favorite states from space data
+      favoriteStates = {for (var space in spaces) space.id: space.isFavorite};
 
       _applyFilters();
     });
   }
 
-  void _sortLibraries() {
-    filteredLibraries.sort((a, b) {
+  void _sortSpaces() {
+    filteredSpaces.sort((a, b) {
       final aFav = favoriteStates[a.id] ?? false;
       final bFav = favoriteStates[b.id] ?? false;
       final aOpen = LibraryUtils.isOpen(a.openat, a.closeat);
       final bOpen = LibraryUtils.isOpen(b.openat, b.closeat);
 
-      // First priority: Favorites vs non-favorites (among open libraries)
-      if (aOpen && bOpen) {
-        if (aFav && !bFav) return -1;
-        if (!aFav && bFav) return 1;
-        // Both have same favorite status, sort by fullness
-        return a.fullness.compareTo(b.fullness);
+      // Create priority scores for each space
+      // Higher score = higher priority (appears first)
+      int aPriority = 0;
+      int bPriority = 0;
+
+      // Base priority: Open = 2000, Closed = 1000
+      if (aOpen) aPriority += 2000;
+      if (bOpen) bPriority += 2000;
+
+      // Favorite bonus: +500 points
+      if (aFav) aPriority += 500;
+      if (bFav) bPriority += 500;
+
+      // Less busy bonus: invert fullness (5-fullness) so lower fullness = higher priority
+      // This gives 0-5 points with 0 being busiest and 5 being least busy
+      aPriority += (5 - a.fullness);
+      bPriority += (5 - b.fullness);
+
+      // Sort by priority (higher priority first)
+      int priorityComparison = bPriority.compareTo(aPriority);
+
+      // If priorities are equal, sort by name as tiebreaker
+      if (priorityComparison == 0) {
+        return a.name.compareTo(b.name);
       }
 
-      // Second priority: Open vs closed libraries
-      if (aOpen && !bOpen) return -1;
-      if (!aOpen && bOpen) return 1;
-
-      // Both closed: sort by name
-      return a.name.compareTo(b.name);
+      return priorityComparison;
     });
   }
 
   void _applyFilters() {
-    filteredLibraries = libraries.where((library) {
+    filteredSpaces = spaces.where((space) {
       // Check each active filter
       for (String filterName in filterStates.keys) {
         if (filterStates[filterName] == true) {
-          if (!_libraryMatchesFilter(library, filterName)) {
+          if (!_spaceMatchesFilter(space, filterName)) {
             return false;
           }
         }
@@ -144,29 +158,29 @@ class _HomeScreenState extends State<HomeScreen> {
       return true;
     }).toList();
 
-    _sortLibraries();
+    _sortSpaces();
   }
 
-  bool _libraryMatchesFilter(Library library, String filterName) {
+  bool _spaceMatchesFilter(Library space, String filterName) {
     switch (filterName) {
       case 'Printers':
-        return library.features.any(
+        return space.features.any(
           (feature) => feature.toLowerCase().contains('print'),
         );
       case '24/7':
-        return library.features.any(
+        return space.features.any(
           (feature) => feature.toLowerCase().contains('24-hour access'),
         );
       case 'Open 2+ hrs':
-        return _libraryOpenForHours(library, 2);
+        return _spaceOpenForHours(space, 2);
       case 'Reservations':
-        return library.reservationid != null;
+        return space.reservationid != null;
       case 'Staffed':
-        return library.features.any(
+        return space.features.any(
           (feature) => feature.toLowerCase().contains('research assistance'),
         );
       case 'Silent':
-        return library.features.any(
+        return space.features.any(
           (feature) => feature.toLowerCase().contains('silent study floors'),
         );
       default:
@@ -174,23 +188,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  bool _libraryOpenForHours(Library library, int hours) {
-    if (!LibraryUtils.isOpen(library.openat, library.closeat)) {
+  bool _spaceOpenForHours(Library space, int hours) {
+    if (!LibraryUtils.isOpen(space.openat, space.closeat)) {
       return false;
     }
 
     final now = DateTime.now();
     int dayIndex = now.weekday - 1;
 
-    if (dayIndex < 0 || dayIndex >= library.closeat.length) {
+    if (dayIndex < 0 || dayIndex >= space.closeat.length) {
       return false;
     }
 
-    int closeTime = library.closeat[dayIndex];
+    int closeTime = space.closeat[dayIndex];
     if (closeTime == 0) return false;
 
     // Handle overnight closing (closes after midnight)
-    if (closeTime < library.openat[dayIndex]) {
+    if (closeTime < space.openat[dayIndex]) {
       // Add 24 hours to closing time for comparison
       closeTime += 2400;
     }
@@ -361,9 +375,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: libraries.isEmpty
+      body: spaces.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : filteredLibraries.isEmpty
+          : filteredSpaces.isEmpty
           ? Column(
               children: [
                 _buildFilterRow(),
@@ -381,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'No Libraries Found',
+                            'No Spaces Found',
                             style: Theme.of(context).textTheme.headlineSmall
                                 ?.copyWith(
                                   color: Colors.grey.shade600,
@@ -406,19 +420,19 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets
                   .zero, // Remove top padding to be flush with app bar
               itemCount:
-                  filteredLibraries.length + 1, // +1 for the filter accordion
+                  filteredSpaces.length + 1, // +1 for the filter accordion
               itemBuilder: (context, index) {
                 // First item is the filter row
                 if (index == 0) {
                   return _buildFilterRow();
                 }
 
-                // Adjust index for library items
-                final libraryIndex = index - 1;
-                final library = filteredLibraries[libraryIndex];
-                final bool isLibraryOpen = LibraryUtils.isOpen(
-                  library.openat,
-                  library.closeat,
+                // Adjust index for space items
+                final spaceIndex = index - 1;
+                final space = filteredSpaces[spaceIndex];
+                final bool isSpaceOpen = LibraryUtils.isOpen(
+                  space.openat,
+                  space.closeat,
                 );
 
                 return Padding(
@@ -427,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     0,
                     16.0,
                     16.0,
-                  ), // No top padding for first library item
+                  ), // No top padding for first space item
                   child: Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
@@ -441,8 +455,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LibraryDetailScreen(
-                                  library: library,
+                                builder: (context) => SpacesDetailScreen(
+                                  library: space,
                                   onHomePressed: widget.onHomePressed,
                                   onTabTapped: widget.onTabTapped,
                                   currentIndex: widget.currentIndex,
@@ -451,14 +465,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           child: Opacity(
-                            opacity: isLibraryOpen ? 1.0 : 0.3,
+                            opacity: isSpaceOpen ? 1.0 : 0.3,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Stack(
                                   children: [
                                     Hero(
-                                      tag: 'library-image-${library.id}',
+                                      tag: 'space-image-${space.id}',
                                       child: ClipRRect(
                                         borderRadius:
                                             const BorderRadius.vertical(
@@ -468,7 +482,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           height: 133,
                                           width: double.infinity,
                                           child: Image.asset(
-                                            library.image,
+                                            space.image,
                                             fit: BoxFit.cover,
                                             errorBuilder:
                                                 (context, error, stackTrace) {
@@ -506,16 +520,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                       right: 8,
                                       child: Tooltip(
                                         message:
-                                            (favoriteStates[library.id] ??
-                                                false)
+                                            (favoriteStates[space.id] ?? false)
                                             ? "Unfavorite"
                                             : "Favorite",
                                         child: GestureDetector(
                                           onTap: () {
                                             setState(() {
-                                              favoriteStates[library.id] =
-                                                  !(favoriteStates[library
-                                                          .id] ??
+                                              favoriteStates[space.id] =
+                                                  !(favoriteStates[space.id] ??
                                                       false);
                                             });
                                           },
@@ -528,12 +540,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               shape: BoxShape.circle,
                                             ),
                                             child: Icon(
-                                              (favoriteStates[library.id] ??
+                                              (favoriteStates[space.id] ??
                                                       false)
                                                   ? Icons.star
                                                   : Icons.star_border,
                                               color:
-                                                  (favoriteStates[library.id] ??
+                                                  (favoriteStates[space.id] ??
                                                       false)
                                                   ? Colors.yellow[600]
                                                   : Colors.white,
@@ -551,19 +563,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      // First row: Library name and report button
+                                      // First row: Space name and report button
                                       Row(
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              library.name,
+                                              space.name,
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .headlineSmall
+                                                  .titleMedium
                                                   ?.copyWith(
                                                     fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
                                                     color: Theme.of(
                                                       context,
                                                     ).colorScheme.onSurface,
@@ -571,14 +584,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 8),
-                                          if (isLibraryOpen)
+                                          if (isSpaceOpen)
                                             Tooltip(
                                               message:
-                                                  'Report capacity for ${library.name}',
+                                                  'Report capacity for ${space.name}',
                                               child: GestureDetector(
                                                 onTap: () {
-                                                  widget.onReportPressed
-                                                      ?.call();
+                                                  widget.onReportPressed?.call(
+                                                    space,
+                                                  );
                                                 },
                                                 child: Container(
                                                   padding: const EdgeInsets.all(
@@ -657,8 +671,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          // Left side - Fullness indicator (only if library is open)
-                                          if (isLibraryOpen)
+                                          // Left side - Fullness indicator (only if space is open)
+                                          if (isSpaceOpen)
                                             Flexible(
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.min,
@@ -669,7 +683,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     decoration: BoxDecoration(
                                                       color:
                                                           ColorUtils.getFullnessColor(
-                                                            library.fullness,
+                                                            space.fullness,
                                                           ),
                                                       shape: BoxShape.circle,
                                                     ),
@@ -678,7 +692,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Flexible(
                                                     child: Text(
                                                       LibraryUtils.getFullnessText(
-                                                        library.fullness,
+                                                        space.fullness,
                                                       ),
                                                       overflow:
                                                           TextOverflow.ellipsis,
@@ -698,16 +712,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 ],
                                               ),
                                             ),
-                                          // If library is closed, use a spacer to push content right
-                                          if (!isLibraryOpen) const Spacer(),
+                                          // If space is closed, use a spacer to push content right
+                                          if (!isSpaceOpen) const Spacer(),
                                           // Right side - Time status
                                           Text(
                                             LibraryUtils.getTimeStatusText(
-                                              library.openat,
-                                              library.closeat,
+                                              space.openat,
+                                              space.closeat,
                                             ),
                                             style: TextStyle(
-                                              color: isLibraryOpen
+                                              color: isSpaceOpen
                                                   ? Colors.green
                                                   : Colors.red,
                                               fontWeight: FontWeight.bold,

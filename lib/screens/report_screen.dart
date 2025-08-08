@@ -30,27 +30,47 @@ class _ReportScreenState extends State<ReportScreen> {
     _loadLibraries();
   }
 
+  @override
+  void didUpdateWidget(ReportScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if preSelectedLibrary changed
+    if (widget.preSelectedLibrary != oldWidget.preSelectedLibrary) {
+      setState(() {
+        _updateSelectedLibrary();
+      });
+    }
+  }
+
   void _loadLibraries() {
     final Map<String, dynamic> data = json.decode(librariesJson);
     final List<dynamic> cornellLibraries = data['locations']['cornell'];
     setState(() {
       libraries = cornellLibraries.map((lib) => Library.fromJson(lib)).toList();
-      // Set preselected library if provided and it's currently open
-      if (widget.preSelectedLibrary != null) {
-        final preselected = libraries.firstWhere(
-          (lib) => lib.id == widget.preSelectedLibrary!.id,
-          orElse: () => widget.preSelectedLibrary!,
-        );
-
-        // Only set as selected if the library is currently open
-        if (LibraryUtils.isOpen(preselected.openat, preselected.closeat)) {
-          selectedLibrary = preselected;
-          // Set slider to current fullness value of the preselected library
-          fullnessValue = selectedLibrary!.fullness.toDouble();
-        }
-        // If preselected library is closed, selectedLibrary remains null
-      }
+      _updateSelectedLibrary();
     });
+  }
+
+  void _updateSelectedLibrary() {
+    // Set preselected library if provided and it's currently open
+    if (widget.preSelectedLibrary != null) {
+      final preselected = libraries.firstWhere(
+        (lib) => lib.id == widget.preSelectedLibrary!.id,
+        orElse: () => widget.preSelectedLibrary!,
+      );
+
+      // Only set as selected if the library is currently open
+      if (LibraryUtils.isOpen(preselected.openat, preselected.closeat)) {
+        selectedLibrary = preselected;
+        // Set slider to current fullness value of the preselected library
+        fullnessValue = selectedLibrary!.fullness.toDouble();
+      } else {
+        // If preselected library is closed, selectedLibrary remains null
+        selectedLibrary = null;
+      }
+    } else {
+      // No preselected library, clear selection
+      selectedLibrary = null;
+    }
   }
 
   void _showSubmitDialog() {

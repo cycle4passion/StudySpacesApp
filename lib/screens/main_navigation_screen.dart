@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/library.dart';
 import 'home_screen.dart';
 import 'report_screen.dart';
 import 'leaderboard_screen.dart';
@@ -20,16 +21,28 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
+  Library? _preselectedLibrary;
 
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
+      // Clear preselected library when navigating manually
+      if (index != 1) {
+        _preselectedLibrary = null;
+      }
     });
   }
 
   void _goToHome() {
     setState(() {
       _currentIndex = 0;
+    });
+  }
+
+  void _goToReportWithLibrary(Library library) {
+    setState(() {
+      _preselectedLibrary = library;
+      _currentIndex = 1; // Navigate to report tab
     });
   }
 
@@ -40,11 +53,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         onThemeToggle: widget.onThemeToggle,
         isDarkMode: widget.isDarkMode,
         onHomePressed: _goToHome,
-        onReportPressed: () => _onTabTapped(1), // Navigate to report tab
+        onReportPressed: _goToReportWithLibrary, // Pass the new callback
         onTabTapped: _onTabTapped,
         currentIndex: _currentIndex,
       ),
-      ReportScreen(onHomePressed: _goToHome),
+      ReportScreen(
+        onHomePressed: _goToHome,
+        preSelectedLibrary: _preselectedLibrary,
+      ),
       LeaderboardScreen(onHomePressed: _goToHome),
       ProfileScreen(onHomePressed: _goToHome),
     ];

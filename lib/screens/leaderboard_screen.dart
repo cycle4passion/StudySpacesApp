@@ -227,16 +227,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       Row(
                         children: periods.map((period) {
                           final isSelected = selectedPeriod == period;
-                          return SizedBox(
-                            width: itemWidth, // Fixed width for each button
-                            height:
-                                52, // Increased from 44 for larger touch targets
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _animateToNewPeriod(period);
-                                },
+                          return GestureDetector(
+                            onTap: () {
+                              _animateToNewPeriod(period);
+                            },
+                            child: SizedBox(
+                              width: itemWidth, // Fixed width for each button
+                              height:
+                                  52, // Increased from 44 for larger touch targets
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
                                 child: Center(
                                   child: AnimatedDefaultTextStyle(
                                     duration: const Duration(milliseconds: 200),

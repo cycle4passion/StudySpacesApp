@@ -240,7 +240,7 @@ const String profileJson = '''
   "profile": {
     "id": "j9999",
     "reports": [1, 3, 5, 22],
-    "rank": [934, 432, 453, 1233]
+    "rank": [934, 432, 453, 1]
   }
 }
 ''';
