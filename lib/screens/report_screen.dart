@@ -669,7 +669,9 @@ class _ReportScreenState extends State<ReportScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Theme.of(
@@ -876,35 +878,44 @@ class _ReportScreenState extends State<ReportScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            // Primary shadow for depth
-                            BoxShadow(
-                              color: Colors.grey.shade400.withValues(
-                                alpha: 0.4,
-                              ),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                              spreadRadius: 1,
-                            ),
-                            // Secondary shadow for more depth
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                              spreadRadius: 0,
-                            ),
-                            // Highlight shadow for 3D effect
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, -2),
-                              spreadRadius: 0,
-                            ),
-                          ],
+                          boxShadow:
+                              Theme.of(context).brightness == Brightness.dark
+                              ? [] // No shadows in dark mode to avoid halo effect
+                              : [
+                                  // Primary shadow for depth
+                                  BoxShadow(
+                                    color: Colors.grey.shade400.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                    spreadRadius: 1,
+                                  ),
+                                  // Secondary shadow for more depth
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 6),
+                                    spreadRadius: 0,
+                                  ),
+                                  // Highlight shadow for 3D effect
+                                  BoxShadow(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, -2),
+                                    spreadRadius: 0,
+                                  ),
+                                ],
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            // Check if we can pop (meaning this screen was pushed)
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            } else {
+                              // Fall back to home navigation
+                              widget.onHomePressed();
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.grey.shade400,
@@ -922,13 +933,19 @@ class _ReportScreenState extends State<ReportScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  offset: const Offset(1, 1),
-                                  blurRadius: 2,
-                                ),
-                              ],
+                              shadows:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? [] // No text shadows in dark mode
+                                  : [
+                                      Shadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        offset: const Offset(1, 1),
+                                        blurRadius: 2,
+                                      ),
+                                    ],
                             ),
                           ),
                         ),
@@ -940,9 +957,11 @@ class _ReportScreenState extends State<ReportScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           boxShadow:
-                              selectedSpace != null &&
-                                  canReportAtCurrentLocation &&
-                                  !isCheckingLocation
+                              Theme.of(context).brightness == Brightness.dark
+                              ? [] // No shadows in dark mode to avoid halo effect
+                              : selectedSpace != null &&
+                                    canReportAtCurrentLocation &&
+                                    !isCheckingLocation
                               ? [
                                   // Primary shadow for depth
                                   BoxShadow(
@@ -1012,9 +1031,12 @@ class _ReportScreenState extends State<ReportScreen> {
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               shadows:
-                                  selectedSpace != null &&
-                                      canReportAtCurrentLocation &&
-                                      !isCheckingLocation
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? [] // No text shadows in dark mode
+                                  : selectedSpace != null &&
+                                        canReportAtCurrentLocation &&
+                                        !isCheckingLocation
                                   ? [
                                       Shadow(
                                         color: Colors.black.withValues(

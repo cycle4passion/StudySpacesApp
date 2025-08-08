@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/space.dart';
 import '../data/spaces_data.dart';
 import 'space_details_screen.dart';
+import 'add_space_screen.dart';
 import '../utils/color_utils.dart';
 import '../utils/spaces_utils.dart';
 import 'dart:convert';
@@ -324,6 +325,83 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildAddSpaceCard() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddSpaceScreen()),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.green,
+                      width: 4, // Reduced from 8 to 4 for better balance
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    size: 40, // Increased from 32 to 40
+                    color: Colors.green,
+                    weight: 900, // Maximum weight for thickest lines
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Add Space',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Suggest a new Study Space!',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -421,11 +499,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           .zero, // Remove top padding to be flush with app bar
                       itemCount:
                           filteredSpaces.length +
-                          1, // +1 for the filter accordion
+                          2, // +1 for the filter accordion, +1 for add space card
                       itemBuilder: (context, index) {
                         // First item is the filter row
                         if (index == 0) {
                           return _buildFilterRow();
+                        }
+
+                        // Last item is the add space card
+                        if (index == filteredSpaces.length + 1) {
+                          return _buildAddSpaceCard();
                         }
 
                         // Adjust index for space items

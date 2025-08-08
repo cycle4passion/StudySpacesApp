@@ -335,8 +335,12 @@ class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
                   ),
                   selected: false, // Use unselected state like filters
                   onSelected: (bool value) {}, // Empty callback instead of null
-                  backgroundColor: backgroundColor.withValues(alpha: 0.15), // Light like filter pastels
-                  selectedColor: backgroundColor.withValues(alpha: 0.15), // Same light color when selected
+                  backgroundColor: backgroundColor.withValues(
+                    alpha: 0.15,
+                  ), // Light like filter pastels
+                  selectedColor: backgroundColor.withValues(
+                    alpha: 0.15,
+                  ), // Same light color when selected
                   checkmarkColor: Colors.black87,
                   avatar: Icon(
                     Icons.check,

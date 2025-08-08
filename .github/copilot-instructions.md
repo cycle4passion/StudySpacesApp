@@ -18,6 +18,7 @@ When working on this project:
 - Use proper JSON serialization for data models
 - always check the utils folder for utility functions for existing function that can help with common tasks like is the space open, color management, space data handling, and text formatting.
 - withOpacity method is deprecated, always use recommended withValues(alpha: value) instead.
+- 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead.
 - when errors are accumulating and you suggest reverting via git, first give option to revert code instead and abort.
 
 If you wish to run flutter analyze and rerun the test environment use chrome not ios please.
