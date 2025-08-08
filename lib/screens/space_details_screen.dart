@@ -325,34 +325,30 @@ class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
                 final Color backgroundColor =
                     roygbivColors[index % roygbivColors.length];
 
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 6.0,
+                return FilterChip(
+                  label: Text(
+                    feature,
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    color: backgroundColor.withValues(alpha: 0.2),
+                  selected: false, // Use unselected state like filters
+                  onSelected: (bool value) {}, // Empty callback instead of null
+                  backgroundColor: backgroundColor.withValues(alpha: 0.15), // Light like filter pastels
+                  selectedColor: backgroundColor.withValues(alpha: 0.15), // Same light color when selected
+                  checkmarkColor: Colors.black87,
+                  avatar: Icon(
+                    Icons.check,
+                    size: 16,
+                    color: Colors.black87,
+                  ), // Add checkmark as avatar instead
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),
-                    border: Border.all(color: backgroundColor, width: 1.5),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 16,
-                        color: backgroundColor,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        feature,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
+                    side: BorderSide(
+                      color: backgroundColor.withValues(alpha: 0.3),
+                      width: 1.0,
+                    ),
                   ),
                 );
               }).toList(),
