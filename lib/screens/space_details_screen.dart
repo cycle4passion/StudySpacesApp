@@ -424,7 +424,9 @@ class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
                   label: Text(
                     feature,
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black87,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -436,11 +438,16 @@ class _SpaceDetailsScreenState extends State<SpaceDetailsScreen> {
                   selectedColor: backgroundColor.withValues(
                     alpha: 0.15,
                   ), // Same light color when selected
-                  checkmarkColor: Colors.black87,
+                  checkmarkColor:
+                      Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
                   avatar: Icon(
                     Icons.check,
                     size: 16,
-                    color: Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ), // Add checkmark as avatar instead
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),

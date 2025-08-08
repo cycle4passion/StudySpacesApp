@@ -85,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // User Info
               Expanded(
                 child: Text(
-                  isLoggedIn ? 'User: $userId' : 'Welcome, Guest',
+                  isLoggedIn ? 'User: $userId' : 'Guest',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
