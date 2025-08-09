@@ -35,15 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Space> filteredSpaces = [];
   Map<String, bool> favoriteStates = {};
 
-  // Filter states
-  Map<String, bool> filterStates = {
-    '24/7': false,
-    'Open 2+ hrs': false,
-    'Reservations': false,
-    'Printers': false,
-    'Staffed': false,
-    'Silent': false,
-  };
+  // Filter states - will be initialized from profile
+  Map<String, bool> filterStates = {};
 
   // ROYGBIV pastel colors for filters
   Map<String, Color> filterColors = {
@@ -85,13 +78,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadSpaces() {
     final data = json.decode(spacesJson);
-    final cornellSpaces = data['locations']['cornell'] as List;
+    final cornellSpaces = data['locations']['cornell']['spaces'] as List;
     setState(() {
       spaces = cornellSpaces.map((lib) => Space.fromJson(lib)).toList();
+
       // Initialize favorite states from profile data
       final favoriteSpaceIds = ProfileUtils.getFavoriteSpaces();
       favoriteStates = {
         for (var space in spaces) space.id: favoriteSpaceIds.contains(space.id),
+      };
+
+      // Initialize filter states from profile data
+      final availableFilters = ProfileUtils.getAvailableFilters();
+      final selectedFilters = ProfileUtils.getSelectedFilters();
+      filterStates = {
+        for (var filter in availableFilters)
+          filter: selectedFilters.contains(filter),
       };
 
       _applyFilters();
@@ -213,6 +215,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return futureTime <= closeTime;
   }
 
+  void _saveSelectedFilters() {
+    // Get currently selected filters
+    final selectedFilters = filterStates.entries
+        .where((entry) => entry.value == true)
+        .map((entry) => entry.key)
+        .toList();
+
+    // Save to profile
+    ProfileUtils.updateSelectedFilters(selectedFilters);
+  }
+
   Widget _buildFilterRow() {
     return Container(
       width: double.infinity,
@@ -259,6 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             filterStates[key] = false;
                           }
                           _applyFilters();
+                          _saveSelectedFilters();
                         });
                       },
                       child: const Padding(
@@ -298,6 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           setState(() {
                             filterStates[filterName] = selected;
                             _applyFilters();
+                            _saveSelectedFilters();
                           });
                         },
                         backgroundColor: filterColors[filterName],

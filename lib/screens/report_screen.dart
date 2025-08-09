@@ -49,7 +49,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   void _loadSpaces() {
     final Map<String, dynamic> data = json.decode(spacesJson);
-    final List<dynamic> cornellSpaces = data['locations']['cornell'];
+    final List<dynamic> cornellSpaces = data['locations']['cornell']['spaces'];
     setState(() {
       spaces = cornellSpaces.map((lib) => Space.fromJson(lib)).toList();
       _updateSelectedSpace();

@@ -107,4 +107,30 @@ class ProfileUtils {
       },
     };
   }
+
+  /// Get available filters from spaces data
+  static List<String> getAvailableFilters() {
+    final data = json.decode(spacesJson);
+    final filters = data['locations']['cornell']['allFilters'] as List<dynamic>;
+    return filters.cast<String>();
+  }
+
+  /// Get user's selected filters
+  static List<String> getSelectedFilters() {
+    final profile = loadProfile();
+    return profile.selectedFilters;
+  }
+
+  /// Update user's selected filters
+  static void updateSelectedFilters(List<String> selectedFilters) {
+    final profile = loadProfile();
+    // Create a new profile with updated selected filters
+    _cachedProfile = Profile(
+      id: profile.id,
+      reports: profile.reports,
+      rank: profile.rank,
+      favorites: profile.favorites,
+      selectedFilters: selectedFilters,
+    );
+  }
 }

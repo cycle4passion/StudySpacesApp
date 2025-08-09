@@ -3,12 +3,14 @@ class Profile {
   final List<int> reports;
   final List<int> rank;
   final List<String> favorites;
+  final List<String> selectedFilters;
 
   Profile({
     required this.id,
     required this.reports,
     required this.rank,
     required this.favorites,
+    required this.selectedFilters,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
@@ -17,11 +19,19 @@ class Profile {
       reports: (json['reports'] as List<dynamic>).cast<int>(),
       rank: (json['rank'] as List<dynamic>).cast<int>(),
       favorites: (json['favorites'] as List<dynamic>).cast<String>(),
+      selectedFilters:
+          (json['selectedFilters'] as List<dynamic>?)?.cast<String>() ?? [],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'reports': reports, 'rank': rank, 'favorites': favorites};
+    return {
+      'id': id,
+      'reports': reports,
+      'rank': rank,
+      'favorites': favorites,
+      'selectedFilters': selectedFilters,
+    };
   }
 
   // Helper methods for reports

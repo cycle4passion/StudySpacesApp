@@ -2,7 +2,8 @@
 const String spacesJson = '''
 {
   "locations": {
-    "cornell": [
+    "cornell": {
+      "spaces": [
       {
         "id": "olin",
         "reservationid": 94,
@@ -170,7 +171,16 @@ const String spacesJson = '''
         "fullness": 2,
         "phone": "(607) 255-2277"
       }
-    ]
+      ],
+      "allFilters": [
+        "24/7",
+        "Open 2+ hrs", 
+        "Reservations",
+        "Printers",
+        "Staffed",
+        "Silent"
+      ]
+    }
   },
   "leaderboard": {
     "day": [
@@ -234,6 +244,8 @@ const String profileJson = '''
     "rank": [934, 432, 453, 1],
     "favorites": [
       "catherwood", "mann", "olin"
+    ],
+    "selectedFilters": [
     ]
   }
 }
