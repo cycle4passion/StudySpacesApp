@@ -58,7 +58,7 @@ class ProfileUtils {
   /// Get available filters from spaces data
   static List<String> getAvailableFilters() {
     final data = json.decode(spacesJson);
-    final filters = data['locations']['cornell']['allFilters'] as List<dynamic>;
+    final filters = data['locations']['cornell']['allfilters'] as List<dynamic>;
     return filters.cast<String>();
   }
 

@@ -163,7 +163,7 @@ const String spacesJson = '''
         "phone": "(607) 255-2277"
       }
       ],
-      "allFilters": [
+      "allfilters": [
         "24/7",
         "Open 2+ hrs", 
         "Reservations",
