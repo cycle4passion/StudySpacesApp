@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:math';
@@ -571,6 +572,6 @@ class SpacesUtils {
   static void updateSpaceFullness(String spaceId, int fullness) {
     // In a real app, this would make an API call to update the server
     // For now, this is just a placeholder for the function signature
-    print('Updating fullness for $spaceId to $fullness');
+    debugPrint('Updating fullness for $spaceId to $fullness');
   }
 }
