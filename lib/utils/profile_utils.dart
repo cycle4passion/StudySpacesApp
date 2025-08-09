@@ -16,23 +16,6 @@ class ProfileUtils {
     return _cachedProfile!;
   }
 
-  /// Get profile statistics
-  static Map<String, dynamic> getProfileStats() {
-    final profile = loadProfile();
-    return {
-      'totalReports': profile.totalReports,
-      'averageReports': profile.averageReports,
-      'highestReports': profile.highestReports,
-      'lowestReports': profile.lowestReports,
-      'reportCount': profile.reports.length,
-      'currentRank': profile.currentRank,
-      'bestRank': profile.bestRank,
-      'worstRank': profile.worstRank,
-      'averageRank': profile.averageRank,
-      'isRankImproving': profile.isRankImproving,
-    };
-  }
-
   /// Get user ID
   static String getUserId() {
     final profile = loadProfile();

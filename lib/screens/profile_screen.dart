@@ -18,7 +18,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isLoggedIn = true;
   String? userId;
-  Map<String, dynamic> stats = {};
 
   @override
   void initState() {
@@ -30,11 +29,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (isLoggedIn) {
       try {
         userId = ProfileUtils.getUserId();
-        stats = ProfileUtils.getProfileStats();
       } catch (e) {
         isLoggedIn = false;
         userId = null;
-        stats = {};
       }
     }
   }
@@ -53,7 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       isLoggedIn = false;
       userId = null;
-      stats = {};
     });
     ScaffoldMessenger.of(
       context,
@@ -150,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatsOverview() {
-    if (!isLoggedIn || stats.isEmpty) {
+    if (!isLoggedIn) {
       return const SizedBox.shrink();
     }
 
@@ -351,10 +347,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             _buildProfileHeader(),
-            if (isLoggedIn && stats.isNotEmpty) ...[
-              _buildStatsOverview(),
-            ] else
-              _buildEmptyState(),
+            if (isLoggedIn) ...[_buildStatsOverview()] else _buildEmptyState(),
             const SizedBox(height: 20),
           ],
         ),
