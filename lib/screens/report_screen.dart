@@ -150,7 +150,10 @@ class _ReportScreenState extends State<ReportScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              widget.onHomePressed(); // Navigate back to home screen
+            },
             child: const Text('OK'),
           ),
         ],
