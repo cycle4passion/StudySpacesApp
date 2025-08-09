@@ -20,7 +20,6 @@ const String spacesJson = '''
         "features": ["24-hour access", "Group study rooms", "Computer lab", "Cafe", "Printers"],
         "floors": 5,
         "capacity": 800,
-        "fullness": 3,
         "phone": "(607) 255-4144"
       },
       {
@@ -39,7 +38,6 @@ const String spacesJson = '''
         "features": ["Silent study floors", "Collaborative spaces", "Research assistance", "Printing services"],
         "floors": 4,
         "capacity": 600,
-        "fullness": 4,
         "phone": "(607) 255-4144"
       },
       {
@@ -58,7 +56,6 @@ const String spacesJson = '''
         "features": ["Research collections", "Digital media lab", "Reservable rooms", "Study carrels", "Meeting rooms"],
         "floors": 3,
         "capacity": 400,
-        "fullness": 2,
         "phone": "(607) 255-3296"
       },
       {
@@ -77,7 +74,6 @@ const String spacesJson = '''
         "features": ["Technical databases", "3D printing", "Maker space", "Collaboration rooms"],
         "floors": 2,
         "capacity": 300,
-        "fullness": 5,
         "phone": "(607) 255-4144"
       },
       {
@@ -95,7 +91,6 @@ const String spacesJson = '''
         "features": ["Rare books", "Manuscript collections", "Asia collections", "Exhibition spaces"],
         "floors": 3,
         "capacity": 200,
-        "fullness": 1,
         "phone": "(607) 255-3530"
       },
       {
@@ -113,7 +108,6 @@ const String spacesJson = '''
         "features": ["Art collections", "Architecture resources", "Visual materials", "Study spaces"],
         "floors": 2,
         "capacity": 150,
-        "fullness": 2,
         "phone": "(607) 255-3710"
       },
       {
@@ -131,7 +125,6 @@ const String spacesJson = '''
         "features": ["Music scores", "Audio collections", "Practice rooms", "Performance space"],
         "floors": 2,
         "capacity": 100,
-        "fullness": 1,
         "phone": "(607) 255-4011"
       },
       {
@@ -149,7 +142,6 @@ const String spacesJson = '''
         "features": ["Legal databases", "Study carrels", "Group study rooms", "Research assistance"],
         "floors": 4,
         "capacity": 500,
-        "fullness": 3,
         "phone": "(607) 255-7236"
       },
       {
@@ -168,7 +160,6 @@ const String spacesJson = '''
         "features": ["Labor research collections", "Reservable rooms", "Research assistance", "Digital collections", "Kheel Center archives"],
         "floors": 2,
         "capacity": 250,
-        "fullness": 2,
         "phone": "(607) 255-2277"
       }
       ],
@@ -247,6 +238,23 @@ const String profileJson = '''
     ],
     "selectedFilters": [
     ]
+  }
+}
+''';
+
+// Fullness JSON data
+const String fullnessJson = '''
+{
+  "fullness": {
+    "olin": 3,
+    "uris": 4,
+    "mann": 2,
+    "engineering": 5,
+    "kroch": 1,
+    "finearts": 2,
+    "music": 1,
+    "law": 3,
+    "catherwood": 2
   }
 }
 ''';

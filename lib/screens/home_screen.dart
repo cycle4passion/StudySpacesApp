@@ -130,8 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Less busy bonus: invert fullness (5-fullness) so lower fullness = higher priority
       // This gives 0-5 points with 0 being busiest and 5 being least busy
-      aPriority += (5 - a.fullness);
-      bPriority += (5 - b.fullness);
+      aPriority += (5 - SpacesUtils.getSpaceFullness(a.id));
+      bPriority += (5 - SpacesUtils.getSpaceFullness(b.id));
 
       // Sort by priority (higher priority first)
       int priorityComparison = bPriority.compareTo(aPriority);
@@ -830,11 +830,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             width: 12,
                                                             height: 12,
                                                             decoration: BoxDecoration(
-                                                              color:
-                                                                  ColorUtils.getFullnessColor(
-                                                                    space
-                                                                        .fullness,
-                                                                  ),
+                                                              color: ColorUtils.getFullnessColor(
+                                                                SpacesUtils.getSpaceFullness(
+                                                                  space.id,
+                                                                ),
+                                                              ),
                                                               shape: BoxShape
                                                                   .circle,
                                                             ),
@@ -845,7 +845,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           Flexible(
                                                             child: Text(
                                                               SpacesUtils.getFullnessText(
-                                                                space.fullness,
+                                                                SpacesUtils.getSpaceFullness(
+                                                                  space.id,
+                                                                ),
                                                               ),
                                                               overflow:
                                                                   TextOverflow

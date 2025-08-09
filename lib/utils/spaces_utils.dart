@@ -1,6 +1,8 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:math';
+import 'dart:convert';
+import '../data/spaces_data.dart';
 
 /// Enum for different types of geofence errors
 enum GeofenceErrorType {
@@ -549,5 +551,26 @@ class SpacesUtils {
         return 'Opens in $days day${days == 1 ? '' : 's'}';
       }
     }
+  }
+
+  /// Get fullness data for a specific space
+  static int getSpaceFullness(String spaceId) {
+    final data = json.decode(fullnessJson);
+    final fullnessData = data['fullness'] as Map<String, dynamic>;
+    return fullnessData[spaceId] ?? 0;
+  }
+
+  /// Get all fullness data
+  static Map<String, int> getAllFullnessData() {
+    final data = json.decode(fullnessJson);
+    final fullnessData = data['fullness'] as Map<String, dynamic>;
+    return fullnessData.cast<String, int>();
+  }
+
+  /// Update fullness for a specific space
+  static void updateSpaceFullness(String spaceId, int fullness) {
+    // In a real app, this would make an API call to update the server
+    // For now, this is just a placeholder for the function signature
+    print('Updating fullness for $spaceId to $fullness');
   }
 }

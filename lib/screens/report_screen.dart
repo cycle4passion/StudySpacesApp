@@ -68,7 +68,9 @@ class _ReportScreenState extends State<ReportScreen> {
       if (SpacesUtils.isOpen(preselected.openat, preselected.closeat)) {
         selectedSpace = preselected;
         // Set slider to current fullness value of the preselected space
-        fullnessValue = selectedSpace!.fullness.toDouble();
+        fullnessValue = SpacesUtils.getSpaceFullness(
+          selectedSpace!.id,
+        ).toDouble();
         // Check location for preselected space
         _checkLocationForSpace(selectedSpace!);
       } else {

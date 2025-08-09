@@ -14,7 +14,6 @@ class Space {
   final List<String> features;
   final int floors;
   final int capacity;
-  final int fullness;
   final String phone;
 
   Space({
@@ -33,7 +32,6 @@ class Space {
     required this.features,
     required this.floors,
     required this.capacity,
-    required this.fullness,
     required this.phone,
   });
 
@@ -54,7 +52,6 @@ class Space {
       features: List<String>.from(json['features']),
       floors: json['floors'],
       capacity: json['capacity'],
-      fullness: json['fullness'],
       phone: json['phone'],
     );
   }
@@ -77,7 +74,6 @@ class Space {
       'features': features,
       'floors': floors,
       'capacity': capacity,
-      'fullness': fullness,
       'phone': phone,
     };
   }
