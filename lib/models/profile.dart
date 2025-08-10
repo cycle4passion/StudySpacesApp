@@ -4,6 +4,7 @@ class Profile {
   final List<int> rank;
   final List<String> favorites;
   final List<String> selectedFilters;
+  bool darkMode;
 
   Profile({
     required this.id,
@@ -11,6 +12,7 @@ class Profile {
     required this.rank,
     required this.favorites,
     required this.selectedFilters,
+    this.darkMode = false,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,7 @@ class Profile {
       favorites: (json['favorites'] as List<dynamic>).cast<String>(),
       selectedFilters:
           (json['selectedFilters'] as List<dynamic>?)?.cast<String>() ?? [],
+      darkMode: json['darkMode'] ?? false,
     );
   }
 
@@ -31,6 +34,7 @@ class Profile {
       'rank': rank,
       'favorites': favorites,
       'selectedFilters': selectedFilters,
+      'darkMode': darkMode,
     };
   }
 

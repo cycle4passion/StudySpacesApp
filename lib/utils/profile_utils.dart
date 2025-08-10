@@ -71,13 +71,27 @@ class ProfileUtils {
   /// Update user's selected filters
   static void updateSelectedFilters(List<String> selectedFilters) {
     final profile = loadProfile();
-    // Create a new profile with updated selected filters
+    // Create a new profile with updated selected filters, preserve darkMode
     _cachedProfile = Profile(
       id: profile.id,
       reports: profile.reports,
       rank: profile.rank,
       favorites: profile.favorites,
       selectedFilters: selectedFilters,
+      darkMode: profile.darkMode,
     );
+  }
+
+  /// Get dark mode state from profile
+  static bool getDarkMode() {
+    final profile = loadProfile();
+    return profile.darkMode;
+  }
+
+  /// Set dark mode state in profile
+  static void setDarkMode(bool value) {
+    final profile = loadProfile();
+    profile.darkMode = value;
+    _cachedProfile = profile;
   }
 }

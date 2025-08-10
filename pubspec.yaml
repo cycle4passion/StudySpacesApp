@@ -43,6 +43,12 @@ dependencies:
   geolocator: ^11.0.0 # For location services and geofencing
   permission_handler: ^11.3.1 # For requesting location permissions
 
+  # API and HTTP packages
+  http: ^1.2.0 # Basic HTTP client for API calls
+  dio: ^5.4.0 # Advanced HTTP client with interceptors, retries, etc.
+  connectivity_plus: ^5.0.2 # Check network connectivity
+  json_annotation: ^4.8.1 # For JSON serialization annotations
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -54,6 +60,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
+  json_serializable: ^6.7.1 # Code generation for JSON serialization
+  build_runner: ^2.4.7 # Required for code generation
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

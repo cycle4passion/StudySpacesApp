@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/main_navigation_screen.dart';
+import 'utils/profile_utils.dart';
 
 void main() {
   runApp(const StudySpacesApp());
@@ -15,33 +16,26 @@ class StudySpacesApp extends StatefulWidget {
 
 class _StudySpacesAppState extends State<StudySpacesApp> {
   bool _isDarkMode = false;
-  static const String _darkModeKey = 'dark_mode_preference';
 
   @override
   void initState() {
     super.initState();
-    _loadDarkModePreference();
+    _isDarkMode = _getProfileDarkMode();
   }
 
-  // Load the dark mode preference from SharedPreferences
-  Future<void> _loadDarkModePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isDarkMode = prefs.getBool(_darkModeKey) ?? false;
-    });
-  }
-
-  // Save the dark mode preference to SharedPreferences
-  Future<void> _saveDarkModePreference(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_darkModeKey, value);
+  bool _getProfileDarkMode() {
+    try {
+      return ProfileUtils.getDarkMode();
+    } catch (_) {
+      return false;
+    }
   }
 
   void _toggleTheme() {
     setState(() {
       _isDarkMode = !_isDarkMode;
+      ProfileUtils.setDarkMode(_isDarkMode);
     });
-    _saveDarkModePreference(_isDarkMode);
   }
 
   @override

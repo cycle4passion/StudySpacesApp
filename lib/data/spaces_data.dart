@@ -237,7 +237,8 @@ const String profileJson = '''
       "catherwood", "mann", "olin"
     ],
     "selectedFilters": [
-    ]
+    ],
+    "darkMode": false
   }
 }
 ''';
